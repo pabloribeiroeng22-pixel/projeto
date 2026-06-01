@@ -82,16 +82,23 @@ textarea{resize:vertical;min-height:90px}
 <div class="card">
   <div class="card-title">🏗 Dados do cliente</div>
 
-  <div class="field-row c2">
+  <div class="field-row c3">
     <div>
       <label>Número do pedido <span class="badge badge-auto">automático</span></label>
       <input type="text" id="inp-pedido" placeholder="Ex: 2117 ou P002117" oninput="buscarPedido(this.value)" autocomplete="off"/>
-      <p class="hint">Digite o número — ex: <strong>2117</strong> para P002117</p>
+      <p class="hint">Ex: <strong>2117</strong> para P002117</p>
     </div>
     <div style="position:relative">
-      <label>Ou buscar por nome do cliente <span class="badge badge-auto">automático</span></label>
-      <input type="text" id="inp-nome" placeholder="Digite o nome do cliente..." oninput="buscarNome(this.value)" autocomplete="off"/>
+      <label>Buscar por nome <span class="badge badge-auto">automático</span></label>
+      <input type="text" id="inp-nome" placeholder="Nome do cliente..." oninput="buscarNome(this.value)" autocomplete="off"/>
       <div id="autocomplete-list" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #b8cef0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:100;max-height:220px;overflow-y:auto;margin-top:2px"></div>
+    </div>
+    <div style="position:relative">
+      <label>Buscar por cidade <span class="badge badge-auto">automático</span></label>
+      <select id="inp-cidade" onchange="buscarCidade(this.value)" style="cursor:pointer">
+        <option value="">— todas as cidades —</option>
+      </select>
+      <div id="cidade-list" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #b8cef0;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:100;max-height:260px;overflow-y:auto;margin-top:2px"></div>
     </div>
   </div>
   <div class="match-box" id="match-box" style="margin-bottom:12px">
@@ -286,6 +293,66 @@ DB.forEach(function(r) {
 
 var atual = null;
 
+// Populate city dropdown
+(function() {
+  var cidades = {};
+  DB.forEach(function(r) { cidades[r.cidade + '/' + r.uf] = {cidade:r.cidade, uf:r.uf}; });
+  var sel = document.getElementById('inp-cidade');
+  Object.keys(cidades).sort().forEach(function(k) {
+    var o = document.createElement('option');
+    o.value = k;
+    o.textContent = cidades[k].cidade + ' — ' + cidades[k].uf;
+    sel.appendChild(o);
+  });
+})();
+
+function buscarCidade(val) {
+  // clear other fields
+  document.getElementById('inp-pedido').value = '';
+  document.getElementById('inp-nome').value = '';
+  document.getElementById('autocomplete-list').style.display = 'none';
+
+  if (!val) { limparCampos(); return; }
+
+  var partes = val.split('/');
+  var cidade = partes[0];
+  var uf = partes[1];
+  var resultados = DB.filter(function(r) { return r.cidade === cidade && r.uf === uf; });
+
+  if (!resultados.length) { limparCampos(); return; }
+
+  // show list if multiple results
+  var list = document.getElementById('cidade-list');
+  if (resultados.length === 1) {
+    list.style.display = 'none';
+    aplicar(resultados[0]);
+    return;
+  }
+
+  list.innerHTML = '<div style="padding:8px 13px;font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid #eee">' + resultados.length + ' clientes em ' + cidade + '</div>';
+  resultados.forEach(function(r) {
+    var item = document.createElement('div');
+    item.style.cssText = 'padding:9px 13px;cursor:pointer;border-bottom:1px solid #eef0f4;font-size:13px';
+    item.innerHTML = '<span style="font-weight:700;color:#1a3d6b">' + r.p + '</span> — ' + r.c;
+    item.onmouseover = function(){ this.style.background='#eef4ff'; };
+    item.onmouseout = function(){ this.style.background=''; };
+    item.onclick = function() {
+      list.style.display = 'none';
+      document.getElementById('inp-cidade').value = val;
+      aplicar(r);
+    };
+    list.appendChild(item);
+  });
+  list.style.display = 'block';
+}
+
+// close cidade list when clicking outside
+document.addEventListener('click', function(e) {
+  var list = document.getElementById('cidade-list');
+  var sel = document.getElementById('inp-cidade');
+  if (list && e.target !== sel) list.style.display = 'none';
+});
+
 function buscarNome(val) {
   var list = document.getElementById('autocomplete-list');
   var inp = document.getElementById('inp-nome');
@@ -434,7 +501,9 @@ function renderFotos() {
 function limpar() {
   document.getElementById('inp-pedido').value = '';
   document.getElementById('inp-nome').value = '';
+  document.getElementById('inp-cidade').value = '';
   document.getElementById('autocomplete-list').style.display = 'none';
+  document.getElementById('cidade-list').style.display = 'none';
   limparCampos();
   ['empreendimento','data-visita','consideracoes','conclusao','outros-det'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
   ['fundacao','montagem','cobertura','piso','outros'].forEach(function(e){ document.getElementById('m-'+e).innerHTML=''; cnt[e]=0; });
@@ -502,7 +571,7 @@ function gerarPDF() {
   +'.al{width:230px;border-bottom:1pt solid #333;margin-bottom:4px}'
   +'.an{font-size:9.5pt;font-weight:700;color:#1a3d6b}'
   +'.ac{font-size:8pt;color:#666}'
-  +'@media print{@page{size:A4;margin:0}.page{padding:14mm 16mm 20mm}}'
+  +'@media print{@page{size:A4;margin:18mm 16mm 16mm 16mm}.page{padding:0;margin:0}.sec{page-break-inside:avoid}.fg{page-break-inside:avoid}.ass{page-break-inside:avoid}}'
   +'</style></head><body><div class="page">'
   +'<div class="header"><div class="hl"><h1>Relatório Técnico</h1><p>Vistoria e Acompanhamento de Obras</p></div><div class="hr"><strong>Grupo JMR</strong>Data: <strong>'+dataFmt+'</strong></div></div>'
   +'<div class="sec"><div class="st">Identificação'+(emObra?'<span class="ob">● Obra em andamento</span>':'')+'</div>'
