@@ -119,10 +119,7 @@ textarea{resize:vertical;min-height:90px}
   <div style="font-size:13px;line-height:1.35"><strong>Instalar como app</strong><br><span style="opacity:.85;font-size:12px">Adicione à tela inicial do celular</span></div>
   <button onclick="instalarApp()" style="background:#fff;color:#185FA5;border:none;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">📲 Instalar</button>
 </div>
-<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-  <p class="page-title">Relatório Técnico</p>
-  <button onclick="fecharApp()" title="Fechar" style="flex-shrink:0;background:#fef2f2;color:#b91c1c;border:1px solid #fca5a5;width:38px;height:38px;border-radius:9px;font-size:18px;font-weight:700;cursor:pointer;line-height:1;margin-top:2px">✕</button>
-</div>
+<p class="page-title">Relatório Técnico</p>
 <p class="page-sub">Digite o número do pedido para preencher os dados automaticamente</p>
 
 <div class="card">
@@ -978,21 +975,6 @@ window.addEventListener('appinstalled', function(){
   if (b) b.style.display = 'none';
   deferredPrompt = null;
 });
-function fecharApp(){
-  // Tenta fechar a janela/aba. Em apps instalados no iPhone isso pode ser bloqueado.
-  var antes = Date.now();
-  try { window.open('', '_self'); window.close(); } catch(e){}
-  setTimeout(function(){
-    if (!window.closed && (Date.now() - antes) < 1500) {
-      // Não fechou (provável iPhone/PWA): oferece limpar e orienta sobre o gesto
-      if (confirm('Não foi possível fechar automaticamente neste aparelho.\n\nToque OK para iniciar um NOVO relatório (limpa os campos), ou feche pelo gesto do celular (deslize para cima).')) {
-        limpar();
-        window.scrollTo(0, 0);
-      }
-    }
-  }, 300);
-}
-
 function instalarApp(){
   if (deferredPrompt){
     deferredPrompt.prompt();
