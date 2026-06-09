@@ -78,6 +78,12 @@ textarea{resize:vertical;min-height:90px}
 .tab{padding:7px 15px;border-radius:8px;font-size:13px;border:1px solid #d0d8e4;background:#f8fafc;color:#555;cursor:pointer;font-weight:500}
 .tab.active{background:#185FA5;border-color:#185FA5;color:#fff;font-weight:600}
 .tab.preenchida{border-color:#16a34a;color:#15803d;font-weight:600}
+.ativ-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a3d6b;margin-bottom:7px}
+.ativ-checks{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ativ-chk{font-size:12.5px;color:#444;background:#fff;border:1px solid #d0d8e4;padding:6px 11px;border-radius:7px;cursor:pointer;user-select:none}
+.ativ-chk.active{background:#185FA5;border-color:#185FA5;color:#fff;font-weight:600}
+.obj-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a3d6b;margin-bottom:5px}
+.obj-fase{width:100%;padding:9px 11px;border:1px solid #d0d8e4;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;color:#333;margin-bottom:4px;box-sizing:border-box}
 .tab.preenchida::before{content:'● ';color:#16a34a}
 .tab.active.preenchida{color:#fff}
 .tab.active.preenchida::before{color:#bbf7d0}
@@ -203,74 +209,107 @@ textarea{resize:vertical;min-height:90px}
 
 <div class="card">
   <div class="card-title">👷 Equipe presente</div>
-  <div class="fase-group">
-    <div class="fase-titulo">Implantação</div>
-    <div class="tabs">
-      <button class="tab" data-etapa="topografia" onclick="aba('topografia',this)">Topografia</button>
-      <button class="tab" data-etapa="terraplenagem" onclick="aba('terraplenagem',this)">Terraplenagem</button>
-      <button class="tab" data-etapa="fundacao" onclick="aba('fundacao',this)">Fundação</button>
-    </div>
-    <div id="p-topografia" class="panel"><div id="m-topografia"></div><button class="btn-add" onclick="add('topografia')">+ Adicionar membro</button></div>
-    <div id="p-terraplenagem" class="panel"><div id="m-terraplenagem"></div><button class="btn-add" onclick="add('terraplenagem')">+ Adicionar membro</button></div>
-    <div id="p-fundacao" class="panel"><div id="m-fundacao"></div><button class="btn-add" onclick="add('fundacao')">+ Adicionar membro</button></div>
+  <div class="tabs">
+    <button class="tab" data-etapa="implantacao" onclick="aba('implantacao',this)">Implantação</button>
+    <button class="tab" data-etapa="fundacoes" onclick="aba('fundacoes',this)">Fundações</button>
+    <button class="tab" data-etapa="estrutura" onclick="aba('estrutura',this)">Estrutura Pré-fabricada</button>
+    <button class="tab" data-etapa="cobertura" onclick="aba('cobertura',this)">Cobertura</button>
+    <button class="tab" data-etapa="fechamentos" onclick="aba('fechamentos',this)">Fechamentos</button>
+    <button class="tab" data-etapa="pisos" onclick="aba('pisos',this)">Pisos e Entrega</button>
+    <button class="tab" data-etapa="terceiros" onclick="aba('terceiros',this)">Terceiros</button>
+    <button class="tab" data-etapa="outros" onclick="aba('outros',this)">Outros</button>
   </div>
-  <div class="fase-group">
-    <div class="fase-titulo">Estrutura</div>
-    <div class="tabs">
-      <button class="tab" data-etapa="prefabricados" onclick="aba('prefabricados',this)">Produção de Pré-fabricados</button>
-      <button class="tab" data-etapa="transporte" onclick="aba('transporte',this)">Transporte</button>
-      <button class="tab" data-etapa="montagem" onclick="aba('montagem',this)">Montagem de Estruturas</button>
+  <div id="p-implantacao" class="panel">
+    <div class="ativ-label">Atividades vistoriadas</div>
+    <div class="ativ-checks">
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Topografia">Topografia</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Locação da obra">Locação da obra</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Terraplenagem">Terraplenagem</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Escavações">Escavações</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Preparação de fundações">Preparação de fundações</div>
     </div>
-    <div id="p-prefabricados" class="panel"><div id="m-prefabricados"></div><button class="btn-add" onclick="add('prefabricados')">+ Adicionar membro</button></div>
-    <div id="p-transporte" class="panel"><div id="m-transporte"></div><button class="btn-add" onclick="add('transporte')">+ Adicionar membro</button></div>
-    <div id="p-montagem" class="panel"><div id="m-montagem"></div><button class="btn-add" onclick="add('montagem')">+ Adicionar membro</button></div>
+    <div class="obj-label">Objetivo da visita</div>
+    <textarea class="obj-fase" id="obj-implantacao" rows="2">Verificar alinhamento, cotas, acessos, interferências e preparação para execução.</textarea>
+    <div class="ativ-label" style="margin-top:10px">Equipe</div>
+    <div id="m-implantacao"></div><button class="btn-add" onclick="add('implantacao')">+ Adicionar membro</button>
   </div>
-  <div class="fase-group">
-    <div class="fase-titulo">Cobertura</div>
-    <div class="tabs">
-      <button class="tab" data-etapa="estrutura" onclick="aba('estrutura',this)">Estrutura de Cobertura</button>
-      <button class="tab" data-etapa="telhamento" onclick="aba('telhamento',this)">Telhamento</button>
-      <button class="tab" data-etapa="lanternim" onclick="aba('lanternim',this)">Lanternim</button>
+  <div id="p-fundacoes" class="panel">
+    <div class="ativ-label">Atividades vistoriadas</div>
+    <div class="ativ-checks">
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Brocas">Brocas</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Estacas">Estacas</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Blocos">Blocos</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Baldrames">Baldrames</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Chumbadores">Chumbadores</div>
     </div>
-    <div id="p-estrutura" class="panel"><div id="m-estrutura"></div><button class="btn-add" onclick="add('estrutura')">+ Adicionar membro</button></div>
-    <div id="p-telhamento" class="panel"><div id="m-telhamento"></div><button class="btn-add" onclick="add('telhamento')">+ Adicionar membro</button></div>
-    <div id="p-lanternim" class="panel"><div id="m-lanternim"></div><button class="btn-add" onclick="add('lanternim')">+ Adicionar membro</button></div>
+    <div class="obj-label">Objetivo da visita</div>
+    <textarea class="obj-fase" id="obj-fundacoes" rows="2">Conferir posicionamento, dimensões, níveis e preparação para montagem.</textarea>
+    <div class="ativ-label" style="margin-top:10px">Equipe</div>
+    <div id="m-fundacoes"></div><button class="btn-add" onclick="add('fundacoes')">+ Adicionar membro</button>
   </div>
-  <div class="fase-group">
-    <div class="fase-titulo">Fechamentos</div>
-    <div class="tabs">
-      <button class="tab" data-etapa="paineis" onclick="aba('paineis',this)">Painéis de Concreto</button>
-      <button class="tab" data-etapa="fechmetal" onclick="aba('fechmetal',this)">Fechamento Metálico</button>
-      <button class="tab" data-etapa="calhas" onclick="aba('calhas',this)">Calhas, Rufos e Vedações</button>
+  <div id="p-estrutura" class="panel">
+    <div class="ativ-label">Atividades vistoriadas</div>
+    <div class="ativ-checks">
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Fabricação das peças">Fabricação das peças</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Recebimento de peças">Recebimento de peças</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Montagem de pilares">Montagem de pilares</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Montagem de vigas">Montagem de vigas</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Travamentos">Travamentos</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Consolidação estrutural">Consolidação estrutural</div>
     </div>
-    <div id="p-paineis" class="panel"><div id="m-paineis"></div><button class="btn-add" onclick="add('paineis')">+ Adicionar membro</button></div>
-    <div id="p-fechmetal" class="panel"><div id="m-fechmetal"></div><button class="btn-add" onclick="add('fechmetal')">+ Adicionar membro</button></div>
-    <div id="p-calhas" class="panel"><div id="m-calhas"></div><button class="btn-add" onclick="add('calhas')">+ Adicionar membro</button></div>
+    <div class="obj-label">Objetivo da visita</div>
+    <textarea class="obj-fase" id="obj-estrutura" rows="2">Avaliar prumo, alinhamento, estabilidade e qualidade dos elementos.</textarea>
+    <div class="ativ-label" style="margin-top:10px">Equipe</div>
+    <div id="m-estrutura"></div><button class="btn-add" onclick="add('estrutura')">+ Adicionar membro</button>
   </div>
-  <div class="fase-group">
-    <div class="fase-titulo">Piso</div>
-    <div class="tabs">
-      <button class="tab" data-etapa="piso" onclick="aba('piso',this)">Piso Industrial</button>
+  <div id="p-cobertura" class="panel">
+    <div class="ativ-label">Atividades vistoriadas</div>
+    <div class="ativ-checks">
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Estrutura de cobertura">Estrutura de cobertura</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Terças">Terças</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Contraventamentos">Contraventamentos</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Telhamento">Telhamento</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Lanternins">Lanternins</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Cumeeiras">Cumeeiras</div>
     </div>
-    <div id="p-piso" class="panel"><div id="m-piso"></div><button class="btn-add" onclick="add('piso')">+ Adicionar membro</button></div>
+    <div class="obj-label">Objetivo da visita</div>
+    <textarea class="obj-fase" id="obj-cobertura" rows="2">Verificar alinhamento, fixações e estanqueidade preliminar.</textarea>
+    <div class="ativ-label" style="margin-top:10px">Equipe</div>
+    <div id="m-cobertura"></div><button class="btn-add" onclick="add('cobertura')">+ Adicionar membro</button>
   </div>
-  <div class="fase-group">
-    <div class="fase-titulo">Apoio</div>
-    <div class="tabs">
-      <button class="tab" data-etapa="guindaste" onclick="aba('guindaste',this)">Guindaste</button>
-      <button class="tab" data-etapa="munck" onclick="aba('munck',this)">Munck</button>
-      <button class="tab" data-etapa="plataforma" onclick="aba('plataforma',this)">Plataforma Elevatória</button>
-      <button class="tab" data-etapa="reparo" onclick="aba('reparo',this)">Reparo/Assistência Técnica</button>
-      <button class="tab" data-etapa="terceiros" onclick="aba('terceiros',this)">Terceiros</button>
-      <button class="tab" data-etapa="outros" onclick="aba('outros',this)">Outros</button>
+  <div id="p-fechamentos" class="panel">
+    <div class="ativ-label">Atividades vistoriadas</div>
+    <div class="ativ-checks">
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Painéis pré-fabricados">Painéis pré-fabricados</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Fechamentos metálicos">Fechamentos metálicos</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Platibandas">Platibandas</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Calhas">Calhas</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Rufos">Rufos</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Arremates">Arremates</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Vedações">Vedações</div>
     </div>
-    <div id="p-guindaste" class="panel"><div id="m-guindaste"></div><button class="btn-add" onclick="add('guindaste')">+ Adicionar membro</button></div>
-    <div id="p-munck" class="panel"><div id="m-munck"></div><button class="btn-add" onclick="add('munck')">+ Adicionar membro</button></div>
-    <div id="p-plataforma" class="panel"><div id="m-plataforma"></div><button class="btn-add" onclick="add('plataforma')">+ Adicionar membro</button></div>
-    <div id="p-reparo" class="panel"><div id="m-reparo"></div><button class="btn-add" onclick="add('reparo')">+ Adicionar membro</button></div>
-    <div id="p-terceiros" class="panel"><div id="m-terceiros"></div><button class="btn-add" onclick="add('terceiros')">+ Adicionar membro</button><div id="terceiros-det-wrap" style="display:none;margin-top:12px"><label>Empresa / Serviço terceirizado</label><input type="text" id="terceiros-det" placeholder="Ex: empresa de içamento, elétrica terceirizada..."/></div></div>
-    <div id="p-outros" class="panel"><div id="m-outros"></div><button class="btn-add" onclick="add('outros')">+ Adicionar membro</button><div id="outros-det-wrap" style="display:none;margin-top:12px"><label>Especificar atividade</label><input type="text" id="outros-det" placeholder="Ex: elétrica, hidráulica, pintura..."/></div></div>
+    <div class="obj-label">Objetivo da visita</div>
+    <textarea class="obj-fase" id="obj-fechamentos" rows="2">Avaliar acabamento, alinhamento e estanqueidade.</textarea>
+    <div class="ativ-label" style="margin-top:10px">Equipe</div>
+    <div id="m-fechamentos"></div><button class="btn-add" onclick="add('fechamentos')">+ Adicionar membro</button>
   </div>
+  <div id="p-pisos" class="panel">
+    <div class="ativ-label">Atividades vistoriadas</div>
+    <div class="ativ-checks">
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Preparação de subleito">Preparação de subleito</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Lastro">Lastro</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Piso industrial">Piso industrial</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Juntas">Juntas</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Acabamentos finais do barracão">Acabamentos finais do barracão</div>
+      <div class="ativ-chk" onclick="chkAtiv(this)" data-val="Correções">Correções</div>
+    </div>
+    <div class="obj-label">Objetivo da visita</div>
+    <textarea class="obj-fase" id="obj-pisos" rows="2">Verificar conformidade para entrega e recebimento da obra.</textarea>
+    <div class="ativ-label" style="margin-top:10px">Equipe</div>
+    <div id="m-pisos"></div><button class="btn-add" onclick="add('pisos')">+ Adicionar membro</button>
+  </div>
+  <div id="p-terceiros" class="panel"><div id="m-terceiros"></div><button class="btn-add" onclick="add('terceiros')">+ Adicionar membro</button><div id="terceiros-det-wrap" style="display:none;margin-top:12px"><label>Empresa / Serviço terceirizado</label><input type="text" id="terceiros-det" placeholder="Ex: empresa de içamento, elétrica terceirizada..."/></div></div>
+  <div id="p-outros" class="panel"><div id="m-outros"></div><button class="btn-add" onclick="add('outros')">+ Adicionar membro</button><div id="outros-det-wrap" style="display:none;margin-top:12px"><label>Especificar atividade</label><input type="text" id="outros-det" placeholder="Ex: elétrica, hidráulica, pintura..."/></div></div>
 </div>
 
 <div class="card">
@@ -664,7 +703,7 @@ function trocarCliente() {
   document.getElementById('inp-pedido').focus();
 }
 
-var cnt = {topografia:0,terraplenagem:0,fundacao:0,prefabricados:0,transporte:0,montagem:0,estrutura:0,telhamento:0,lanternim:0,paineis:0,fechmetal:0,calhas:0,piso:0,guindaste:0,munck:0,plataforma:0,reparo:0,terceiros:0,outros:0};
+var cnt = {implantacao:0,fundacoes:0,estrutura:0,cobertura:0,fechamentos:0,pisos:0,terceiros:0,outros:0};
 function add(e) {
   var n = ++cnt[e];
   var id = 'mr-' + e + '-' + n;
@@ -693,15 +732,18 @@ function temEquipe(e) {
   return membros(e).length > 0;
 }
 
-// Atualiza a marca verde nas abas conforme membros preenchidos
+// Atualiza a marca verde nas abas conforme equipe ou atividades preenchidas
 function atualizarMarcas() {
-  ['topografia','terraplenagem','fundacao','prefabricados','transporte','montagem','estrutura','telhamento','lanternim','paineis','fechmetal','calhas','piso','guindaste','munck','plataforma','reparo','terceiros','outros'].forEach(function(e){
+  ['implantacao','fundacoes','estrutura','cobertura','fechamentos','pisos','terceiros','outros'].forEach(function(e){
     var btn = document.querySelector('.tab[data-etapa="'+e+'"]');
     if (!btn) return;
-    if (temEquipe(e)) btn.classList.add('preenchida');
+    var temAtiv = document.querySelectorAll('#p-'+e+' .ativ-chk.active').length > 0;
+    if (temEquipe(e) || temAtiv) btn.classList.add('preenchida');
     else btn.classList.remove('preenchida');
   });
 }
+
+function chkAtiv(el) { el.classList.toggle('active'); atualizarMarcas(); }
 
 function chk(el) { el.classList.toggle('active'); }
 
@@ -709,22 +751,40 @@ function membros(e) {
   return Array.from(document.querySelectorAll('#m-' + e + ' input')).map(function(i){ return i.value.trim(); }).filter(Boolean);
 }
 
-var FASES = [{fase:'Implantação',etapas:['topografia','terraplenagem','fundacao']},{fase:'Estrutura',etapas:['prefabricados','transporte','montagem']},{fase:'Cobertura',etapas:['estrutura','telhamento','lanternim']},{fase:'Fechamentos',etapas:['paineis','fechmetal','calhas']},{fase:'Piso',etapas:['piso']},{fase:'Apoio',etapas:['guindaste','munck','plataforma','reparo','terceiros','outros']}];
-var NOMES_ETAPA = {topografia:'Topografia',terraplenagem:'Terraplenagem',fundacao:'Fundação',prefabricados:'Produção de Pré-fabricados',transporte:'Transporte',montagem:'Montagem de Estruturas',estrutura:'Estrutura de Cobertura',telhamento:'Telhamento',lanternim:'Lanternim',paineis:'Painéis de Concreto',fechmetal:'Fechamento Metálico',calhas:'Calhas, Rufos e Vedações',piso:'Piso Industrial',guindaste:'Guindaste',munck:'Munck',plataforma:'Plataforma Elevatória',reparo:'Reparo/Assistência Técnica',terceiros:'Terceiros',outros:'Outros'};
+var FASES = [
+  {key:'implantacao', nome:'Implantação'},
+  {key:'fundacoes', nome:'Fundações'},
+  {key:'estrutura', nome:'Estrutura Pré-fabricada'},
+  {key:'cobertura', nome:'Cobertura'},
+  {key:'fechamentos', nome:'Fechamentos'},
+  {key:'pisos', nome:'Pisos e Entrega'}
+];
+var EXTRAS = [{key:'terceiros', nome:'Terceiros'},{key:'outros', nome:'Outros'}];
 
+function atividadesMarcadas(key) {
+  return Array.from(document.querySelectorAll('#p-'+key+' .ativ-chk.active')).map(function(el){ return el.getAttribute('data-val'); });
+}
+
+// Retorna os dados das fases preenchidas (com equipe, atividades ou objetivo alterado) + extras
 function equipeLinhas() {
-  return FASES.map(function(f){
-    var linhas = f.etapas.reduce(function(acc,e){
-      var m = membros(e);
-      if (!m.length) return acc;
-      var det = '';
-      if (e === 'outros') det = document.getElementById('outros-det').value.trim();
-      if (e === 'terceiros') det = document.getElementById('terceiros-det').value.trim();
-      acc.push({etapa:NOMES_ETAPA[e], membros:m.join(', '), detalhe:det});
-      return acc;
-    }, []);
-    return {fase:f.fase, linhas:linhas};
-  }).filter(function(g){ return g.linhas.length > 0; });
+  var grupos = FASES.map(function(f){
+    var m = membros(f.key);
+    var ativ = atividadesMarcadas(f.key);
+    var objEl = document.getElementById('obj-'+f.key);
+    var obj = objEl ? objEl.value.trim() : '';
+    return {fase:f.nome, membros:m, atividades:ativ, objetivo:obj};
+  }).filter(function(g){ return g.membros.length || g.atividades.length; });
+
+  var extras = EXTRAS.map(function(e){
+    var m = membros(e.key);
+    if (!m.length) return null;
+    var det = '';
+    if (e.key === 'outros') det = document.getElementById('outros-det').value.trim();
+    if (e.key === 'terceiros') det = document.getElementById('terceiros-det').value.trim();
+    return {fase:e.nome, membros:m, atividades:[], objetivo:'', detalhe:det};
+  }).filter(Boolean);
+
+  return grupos.concat(extras);
 }
 
 var fotos = [];
@@ -844,7 +904,11 @@ function limpar() {
   document.getElementById('cidade-list').style.display = 'none';
   limparCampos();
   ['empreendimento','data-visita','consideracoes','conclusao','outros-det','terceiros-det'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-  ['topografia','terraplenagem','fundacao','prefabricados','transporte','montagem','estrutura','telhamento','lanternim','paineis','fechmetal','calhas','piso','guindaste','munck','plataforma','reparo','terceiros','outros'].forEach(function(e){ document.getElementById('m-'+e).innerHTML=''; cnt[e]=0; });
+  ['implantacao','fundacoes','estrutura','cobertura','fechamentos','pisos','terceiros','outros'].forEach(function(e){ document.getElementById('m-'+e).innerHTML=''; cnt[e]=0; });
+  document.querySelectorAll('.ativ-chk.active').forEach(function(el){ el.classList.remove('active'); });
+  var OBJ_PADRAO = {implantacao:'Verificar alinhamento, cotas, acessos, interferências e preparação para execução.',fundacoes:'Conferir posicionamento, dimensões, níveis e preparação para montagem.',estrutura:'Avaliar prumo, alinhamento, estabilidade e qualidade dos elementos.',cobertura:'Verificar alinhamento, fixações e estanqueidade preliminar.',fechamentos:'Avaliar acabamento, alinhamento e estanqueidade.',pisos:'Verificar conformidade para entrega e recebimento da obra.'};
+  Object.keys(OBJ_PADRAO).forEach(function(k){ var el=document.getElementById('obj-'+k); if(el) el.value=OBJ_PADRAO[k]; });
+  atualizarMarcas();
   document.getElementById('outros-det-wrap').style.display = 'none';
   document.getElementById('terceiros-det-wrap').style.display = 'none';
   document.querySelectorAll('#checks .chk.active').forEach(function(el){ el.classList.remove('active'); });
@@ -878,7 +942,13 @@ function gerarPDF() {
     : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cidadeUf);
 
   var equipeHtml = equipe.length
-    ? equipe.map(function(g){ return '<div class="efase"><div class="efase-t">'+g.fase+'</div>'+g.linhas.map(function(e){ return '<div class="el"><span class="et">'+e.etapa+'</span><span>'+e.membros+(e.detalhe?' <em>('+e.detalhe+')</em>':'')+'</span></div>'; }).join('')+'</div>'; }).join('')
+    ? equipe.map(function(g){
+        var inner = '<div class="efase"><div class="efase-t">'+g.fase+'</div>';
+        if (g.objetivo) inner += '<div class="efase-obj"><strong>Objetivo:</strong> '+g.objetivo+'</div>';
+        if (g.atividades && g.atividades.length) inner += '<div class="efase-ativ"><strong>Atividades:</strong> '+g.atividades.join(' • ')+'</div>';
+        if (g.membros && g.membros.length) inner += '<div class="efase-eq"><strong>Equipe:</strong> '+g.membros.join(', ')+(g.detalhe?' <em>('+g.detalhe+')</em>':'')+'</div>';
+        return inner + '</div>';
+      }).join('')
     : '<span class="nd">Não informado</span>';
 
   var fotosHtml = fotos.length
@@ -916,6 +986,10 @@ function gerarPDF() {
   +'.et{font-size:8pt;font-weight:700;color:#1a3d6b;min-width:74px;text-transform:uppercase;letter-spacing:.04em}'
   +'.efase{margin-bottom:9px}'
   +'.efase-t{font-size:8.5pt;font-weight:700;color:#1a3d6b;background:#eef2f8;padding:3px 8px;border-radius:3px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}'
+  +'.efase-obj{font-size:9.5pt;color:#333;padding:2px 2px 2px 8px;line-height:1.4}'
+  +'.efase-ativ{font-size:9.5pt;color:#333;padding:2px 2px 2px 8px;line-height:1.4}'
+  +'.efase-eq{font-size:9.5pt;color:#111;padding:2px 2px 4px 8px;line-height:1.4}'
+  +'.efase-obj strong,.efase-ativ strong,.efase-eq strong{color:#1a3d6b;font-weight:700}'
   +'.chips{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}'
   +'.chip{font-size:8.5pt;padding:3px 11px;background:#e8eef7;color:#1a3d6b;font-weight:700;border-radius:3px}'
   +'.ta{font-size:10pt;line-height:1.7;color:#111;padding:5px 0;min-height:40px}'
@@ -930,7 +1004,8 @@ function gerarPDF() {
   +'.ac{font-size:8pt;color:#666}'
   +'@media print{@page{size:A4;margin:18mm 16mm 16mm 16mm;margin-header:0;margin-footer:0}.page{padding:0;margin:0}.sec{page-break-inside:avoid}.fg{page-break-inside:avoid}.ass{page-break-inside:avoid}}'
   +'</style></head><body><div class="page">'
-  +'<div class="header"><div class="hl"><h1>Relatório Técnico</h1><p>Vistoria e Acompanhamento de Obras</p></div><div class="hr" style="display:flex;align-items:center;gap:12px"><img src="'+logoLucol+'" style="height:46px;width:auto;display:block"/><div><strong>Grupo JMR</strong>Data: <strong>'+dataFmt+'</strong></div></div></div>'
+  +'<div style="text-align:center;margin-bottom:12px"><img src="'+logoLucol+'" style="height:60px;width:auto;display:inline-block"/></div>'
+  +'<div class="header"><div class="hl"><h1>Relatório Técnico</h1><p>Vistoria e Acompanhamento de Obras</p></div><div class="hr"><strong>Grupo JMR</strong>Data: <strong>'+dataFmt+'</strong></div></div>'
   +'<div class="sec"><div class="st">Identificação'+(emObra?'<span class="ob">● Obra em andamento</span>':'')+'</div>'
   +'<div class="g2"><div class="f"><div class="fl">Pedido / Contrato</div><div class="fv">'+pedido+'</div></div><div class="f"><div class="fl">Cliente</div><div class="fv">'+cliente+'</div></div></div>'
   +'<div class="g2"><div class="f"><div class="fl">Empreendimento</div><div class="fv">'+empr+'</div></div><div class="f"><div class="fl">Município / Estado</div><div class="fv">'+local+(end?'':'<br><a href="'+mapsUrl+'" target="_blank" style="color:#185FA5;font-size:9pt;font-weight:600;text-decoration:none;margin-top:4px;display:inline-block">📍 Ver localização no mapa</a>')+'</div></div></div>'
@@ -941,7 +1016,7 @@ function gerarPDF() {
   +'<div class="sec"><div class="st">Dados da visita</div>'
   +'<div class="g3"><div class="f"><div class="fl">Data</div><div class="fv">'+dataFmt+'</div></div><div class="f"><div class="fl">Responsável técnico</div><div class="fv">Pablo Rodrigo Ribeiro</div></div><div class="f"><div class="fl">CREA</div><div class="fv">83.338/D-PR</div></div></div>'
   +'</div>'
-  +(equipe.length?'<div class="sec"><div class="st">Equipe presente por etapa</div>'+equipeHtml+'</div>':'')
+  +(equipe.length?'<div class="sec"><div class="st">Equipe presente por fase</div>'+equipeHtml+'</div>':'')
   +'<div class="sec"><div class="st">Objetivo da visita</div>'+(objs.length?'<div class="chips">'+objs.map(function(o){return'<span class="chip">'+o+'</span>';}).join('')+'</div>':'<span class="nd">Não informado</span>')+'</div>'
   +'<div class="sec"><div class="st">Considerações técnicas</div><div class="ta">'+cons.replace(/\n/g,'<br>')+'</div></div>'
   +'<div class="sec"><div class="st">Conclusão</div><div class="ta">'+conc.replace(/\n/g,'<br>')+'</div></div>'
