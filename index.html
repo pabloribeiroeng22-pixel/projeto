@@ -41,8 +41,23 @@ textarea{resize:vertical;min-height:90px}
 .match-nome{font-size:12px;color:#555;margin-top:2px}
 .auto-fields{display:none;gap:12px;margin-bottom:12px}
 .auto-fields.show{display:grid}
-.maps-link{display:none;font-size:13px;color:#185FA5;font-weight:600;margin-top:6px;text-decoration:none}
-.maps-link.show{display:inline-block}
+.loc-box{display:none;margin-bottom:12px;border-radius:10px;padding:13px 15px;border:1px solid}
+.loc-box.show{display:block}
+.loc-box.exata{background:#f0fdf4;border-color:#86efac}
+.loc-box.cidade{background:#fffbeb;border-color:#fcd34d}
+.loc-head{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.loc-box.exata .loc-head{color:#15803d}
+.loc-box.cidade .loc-head{color:#b45309}
+.loc-text{font-size:14px;color:#1a1a1a;font-weight:600;margin-bottom:10px;line-height:1.35}
+.loc-btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:14px;font-weight:700;padding:10px 18px;border-radius:8px;color:#fff;width:100%;justify-content:center;box-sizing:border-box}
+.loc-box.exata .loc-btn{background:#16a34a}
+.loc-box.cidade .loc-btn{background:#d97706}
+.loc-aviso{font-size:11px;color:#b45309;margin-top:7px;text-align:center}
+.tipo-wrap{display:none;margin-bottom:12px}
+.tipo-wrap.show{display:block}
+.tipo-toggle{width:100%;text-align:left;background:#f8fafc;border:1px solid #d0d8e4;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:#555;cursor:pointer}
+.tipo-toggle:hover{background:#eef2f7}
+.tipo-body{margin-top:8px;padding:12px 15px;background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;font-size:13.5px;color:#333;line-height:1.45}
 .eng-fixed{display:flex;align-items:center;gap:10px;padding:10px 13px;background:#eef4ff;border:1px solid #b8cef0;border-radius:8px}
 .eng-avatar{width:38px;height:38px;border-radius:50%;background:#185FA5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
 .eng-name{font-size:14px;font-weight:600;color:#1a3d6b}
@@ -50,6 +65,10 @@ textarea{resize:vertical;min-height:90px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .tab{padding:7px 15px;border-radius:8px;font-size:13px;border:1px solid #d0d8e4;background:#f8fafc;color:#555;cursor:pointer;font-weight:500}
 .tab.active{background:#185FA5;border-color:#185FA5;color:#fff;font-weight:600}
+.tab.preenchida{border-color:#16a34a;color:#15803d;font-weight:600}
+.tab.preenchida::before{content:'● ';color:#16a34a}
+.tab.active.preenchida{color:#fff}
+.tab.active.preenchida::before{color:#bbf7d0}
 .panel{display:none}
 .panel.show{display:block}
 .membro-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
@@ -112,9 +131,10 @@ textarea{resize:vertical;min-height:90px}
       </select>
     </div>
   </div>
-  <div class="match-box" id="match-box" style="margin-bottom:12px">
+  <div class="match-box" id="match-box" style="margin-bottom:12px;position:relative">
     <div class="match-pedido" id="match-pedido"></div>
     <div class="match-nome" id="match-nome"></div>
+    <button onclick="trocarCliente()" style="margin-top:8px;background:#fff;color:#185FA5;border:1px solid #b8cef0;padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">↺ Trocar / limpar cliente</button>
   </div>
   <div id="cidade-list" style="display:none;background:#fff;border:1px solid #b8cef0;border-radius:8px;margin-bottom:12px;overflow:hidden"></div>
 
@@ -130,8 +150,24 @@ textarea{resize:vertical;min-height:90px}
         <span class="badge-obra" id="badge-obra">● Obra em andamento</span>
       </label>
       <input class="auto" id="af-end" readonly/>
-      <a class="maps-link" id="maps-link" href="#" target="_blank">📍 Ver no Google Maps</a>
     </div>
+  </div>
+
+  <div class="loc-box" id="loc-box">
+    <div class="loc-head" id="loc-head">📍 Localização</div>
+    <div class="loc-text" id="loc-text"></div>
+    <a class="loc-btn" id="loc-btn" href="#" target="_blank">Abrir no Google Maps</a>
+    <div class="loc-aviso" id="loc-aviso" style="display:none">Endereço exato não cadastrado — mostrando a cidade como referência.</div>
+  </div>
+
+  <div class="tipo-wrap" id="sit-wrap">
+    <button type="button" class="tipo-toggle" id="sit-toggle" onclick="toggleSit()">▸ Ver situação atual <span style="font-weight:500;color:#888">(atualizada semanalmente)</span></button>
+    <div class="tipo-body" id="sit-body" style="display:none"></div>
+  </div>
+
+  <div class="tipo-wrap" id="tipo-wrap">
+    <button type="button" class="tipo-toggle" id="tipo-toggle" onclick="toggleTipo()">▸ Ver tipo de obra / o que está comercializado</button>
+    <div class="tipo-body" id="tipo-body" style="display:none"></div>
   </div>
 
   <div class="field-row c1">
@@ -156,14 +192,14 @@ textarea{resize:vertical;min-height:90px}
 <div class="card">
   <div class="card-title">👷 Equipe presente</div>
   <div class="tabs">
-    <button class="tab" onclick="aba('fundacao',this)">Fundação</button>
-    <button class="tab" onclick="aba('terraplenagem',this)">Terraplenagem</button>
-    <button class="tab" onclick="aba('montagem',this)">Montagem</button>
-    <button class="tab" onclick="aba('estrutura',this)">Estrutura de Cobertura</button>
-    <button class="tab" onclick="aba('calhas',this)">Calhas, Rufos e Vedações</button>
-    <button class="tab" onclick="aba('piso',this)">Piso</button>
-    <button class="tab" onclick="aba('terceiros',this)">Terceiros</button>
-    <button class="tab" onclick="aba('outros',this)">Outros</button>
+    <button class="tab" data-etapa="fundacao" onclick="aba('fundacao',this)">Fundação</button>
+    <button class="tab" data-etapa="terraplenagem" onclick="aba('terraplenagem',this)">Terraplenagem</button>
+    <button class="tab" data-etapa="montagem" onclick="aba('montagem',this)">Montagem</button>
+    <button class="tab" data-etapa="estrutura" onclick="aba('estrutura',this)">Estrutura de Cobertura</button>
+    <button class="tab" data-etapa="calhas" onclick="aba('calhas',this)">Calhas, Rufos e Vedações</button>
+    <button class="tab" data-etapa="piso" onclick="aba('piso',this)">Piso</button>
+    <button class="tab" data-etapa="terceiros" onclick="aba('terceiros',this)">Terceiros</button>
+    <button class="tab" data-etapa="outros" onclick="aba('outros',this)">Outros</button>
   </div>
   <div id="p-fundacao" class="panel"><div id="m-fundacao"></div><button class="btn-add" onclick="add('fundacao')">+ Adicionar membro</button></div>
   <div id="p-terraplenagem" class="panel"><div id="m-terraplenagem"></div><button class="btn-add" onclick="add('terraplenagem')">+ Adicionar membro</button></div>
@@ -200,7 +236,8 @@ textarea{resize:vertical;min-height:90px}
     <div class="chk" onclick="chk(this)" data-val="Liberação para Fabricação">Liberação para Fabricação</div>
     <div class="chk" onclick="chk(this)" data-val="Definição de Projeto com Cliente">Definição de Projeto com Cliente</div>
     <div class="chk" onclick="chk(this)" data-val="Entrega de Obra">Entrega de Obra</div>
-    <div class="chk" onclick="chk(this)" data-val="Reunião com Engenheiro">Reunião com Engenheiro</div>
+    <div class="chk" onclick="chk(this)" data-val="Reunião com Cliente">Reunião com Cliente</div>
+    <div class="chk" onclick="chk(this)" data-val="Reunião com Engenheiro/Arquiteto">Reunião com Engenheiro/Arquiteto</div>
   </div>
 </div>
 
@@ -238,76 +275,76 @@ textarea{resize:vertical;min-height:90px}
 
 <script>
 var DB = [
-  {p:"P001003",c:"Kazuyoshi Wakimoto",cidade:"Piraí do Sul",uf:"PR"},
-  {p:"P001032",c:"Hemisfério Sul Empreendimentos Imobiliários Ltda",cidade:"São Paulo",uf:"SP"},
-  {p:"P000346",c:"Luiz Cesar Spolador",cidade:"Ponta Grossa",uf:"PR"},
-  {p:"P001792",c:"Thais Helena Saldanha",cidade:"Sengés",uf:"PR"},
-  {p:"P001706",c:"Allison Maldonado",cidade:"Castro",uf:"PR"},
-  {p:"P001855",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR"},
-  {p:"P002051",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR"},
-  {p:"P002078",c:"CEZ Engenharia Ltda",cidade:"Telêmaco Borba",uf:"PR",end:"Avenida Nações Unidas, S/N, Centro, Telêmaco Borba – PR"},
-  {p:"P002097",c:"Willem Johan Strijker",cidade:"Castro",uf:"PR",end:"Chácara Jardim do Eden, S/N, ABAPA, Castro – PR"},
-  {p:"P001891",c:"Denise Rodrigues Valle Fayad",cidade:"Quatiguá",uf:"PR"},
-  {p:"P002180",c:"Neverton Rodrigues da Silva Auto Elétrica",cidade:"Telêmaco Borba",uf:"PR",end:"Rua Vereador José Ozório de Camargo, S/N, Socomim, Telêmaco Borba – PR"},
-  {p:"P002187",c:"Alberto Reinaldo Los",cidade:"Carambeí",uf:"PR"},
-  {p:"P002277",c:"Romildo Dallarmi",cidade:"Castro",uf:"PR"},
-  {p:"P002309",c:"Camilo Miguel Barth",cidade:"Castro",uf:"PR"},
-  {p:"P002307",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR"},
-  {p:"P002294",c:"Gerson Luis Zych",cidade:"Arapoti",uf:"PR"},
-  {p:"P002291",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP"},
-  {p:"P002313",c:"Boranelli Administradora de Bens Ltda",cidade:"Itapeva",uf:"SP",end:"Avenida Dona Paulina de Morais, 396, Jardim Maringá, Itapeva – SP",obra:true},
-  {p:"P002295",c:"Tuvivas Participações Ltda (Marjan)",cidade:"São Paulo",uf:"SP",end:"Rua Vigário Taques Bitencourt, 242, Santo Amaro, São Paulo – SP"},
-  {p:"P002331",c:"Eltje Jan Rabbers",cidade:"Piraí do Sul",uf:"PR"},
-  {p:"P002336",c:"Jennifer Camily da Silva Moreira",cidade:"Guaiçara",uf:"SP"},
-  {p:"P002314",c:"Luiz Fernando Rodrigues da Silva",cidade:"Ponta Grossa",uf:"PR"},
-  {p:"P002346",c:"Marinus Hajen",cidade:"Arapoti",uf:"PR",end:"Chácara Linquinda, s/n, 2ª Lomba, Colônia Holandesa, Arapoti – PR",obra:true},
-  {p:"P002378",c:"Marinus Hagen Filho",cidade:"Arapoti",uf:"PR"},
-  {p:"P002343",c:"Jose Carlos Oppis",cidade:"Araucária",uf:"PR"},
-  {p:"P000619",c:"Marcos Krubnik",cidade:"Piraí do Sul",uf:"PR",end:"Rodovia PR 090, km 155, s/n, Campina do Butiá, Piraí do Sul – PR",obra:true},
-  {p:"P002393",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR"},
-  {p:"P002173",c:"Diego Felippe Geremias de Souza",cidade:"Promissão",uf:"SP"},
-  {p:"P002341",c:"Mario Gabriel Filho",cidade:"Taquarituba",uf:"SP"},
-  {p:"P002347",c:"Sigmund Schartner",cidade:"Palmeira",uf:"PR",end:"Chácara Úrsula, s/n, Colônia Witmarsum, Palmeira – PR",obra:true},
-  {p:"P002356",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR"},
-  {p:"P002352",c:"Academia Fitshape Ltda",cidade:"Castro",uf:"PR",end:"Rua Coronel Vidal Martins de Oliveira, 677, Vila Rio Branco, Castro – PR"},
-  {p:"P002345",c:"Luiz Fernando Rodrigues",cidade:"Ponta Grossa",uf:"PR"},
-  {p:"P001682",c:"JFR Empreendimentos Imobiliarios Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Avenida Visconde de Taunay, 1417, Ronda, Ponta Grossa – PR"},
-  {p:"P002367",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR"},
-  {p:"P002373",c:"SRB Consultoria e Assessoria Empresarial Ltda",cidade:"Curitiba",uf:"PR",end:"Rua Chile, 1791, Rebouças, Curitiba – PR"},
-  {p:"P002364",c:"Lilian da Rosa Weigert Benazzi Ltda",cidade:"Jaguariaíva",uf:"PR",end:"Rua Rovilio Christianetti, 475, Distrito Industrial Ari Fanchin, Jaguariaíva – PR",obra:true},
-  {p:"P002358",c:"Anderson Santos",cidade:"Castro",uf:"PR",end:"Avenida das Flores, S/N, Jardim Termas Riviera, Castro – PR"},
-  {p:"P002368",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR"},
-  {p:"P002360",c:"Daniel Leonardo Los",cidade:"Carambeí",uf:"PR",end:"Chácara Talismã, s/n, Bairro Catanduva, Carambeí – PR",obra:true},
-  {p:"P002354",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR"},
-  {p:"P002416",c:"Adriaan Frederik Kok",cidade:"Arapoti",uf:"PR"},
-  {p:"P001686",c:"Paroquia Senhor Menino Deus",cidade:"Piraí do Sul",uf:"PR",end:"Capela São Pedro, S/N, Tijuco Preto, Castro – PR"},
-  {p:"P002357",c:"Fabiano Pauls",cidade:"Palmeira",uf:"PR",end:"Chácara Granja CP Rocky, s/n, Colônia Witmarsum, Palmeira – PR",obra:true},
-  {p:"P002350",c:"Paulo Sergio Assunção",cidade:"Tibagi",uf:"PR",end:"Fazenda Santa Branca, s/n, Bairro Alto do Amparo, Tibagi – PR",obra:true},
-  {p:"P001685",c:"Viverti Apucarana 03 Incorporação Imobiliaria SPE Ltda",cidade:"Apucarana",uf:"PR",end:"Rua José Ferragine, S/N, Conj. Habitacional Solo Sagrado, Apucarana – PR",obra:true},
-  {p:"P002395",c:"Zero Residuos Ltda",cidade:"Ponta Grossa",uf:"PR"},
-  {p:"P002361",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR"},
-  {p:"P002380",c:"Luiz Jose Sguario Neto / Veneto Participações",cidade:"Itapeva",uf:"SP",end:"Rodovia Governador Mário Covas, S/N, Ribeirão Fundo, Itapeva – SP"},
-  {p:"P001687",c:"Otoniel de Jesus",cidade:"Ponta Grossa",uf:"PR"},
-  {p:"P001684",c:"William Benke",cidade:"Castro",uf:"PR"},
-  {p:"P002117",c:"Unicesumar",cidade:"Ponta Grossa",uf:"PR",end:"Rua Desembargador Westphalen, 60, Oficinas, Ponta Grossa – PR"},
-  {p:"P002321",c:"Mateus de Oliveira Silvestre de Moraes",cidade:"Palmital",uf:"SP",end:"Rua Jesus Ortis Toral, 227/239, Distrito Industrial Basílio, Palmital – SP"},
-  {p:"P002391",c:"JRW Veiculos Ltda",cidade:"Telêmaco Borba",uf:"PR"},
-  {p:"P002254",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP"},
-  {p:"P002417",c:"Centro de Treinamento para Pecuaristas",cidade:"Castro",uf:"PR",end:"Fazenda Capão do Cipó, S/N, Maracanã, Castro – PR"},
-  {p:"P002410",c:"Tiago Dias de Oliveira",cidade:"Itapeva",uf:"SP"},
-  {p:"P002396",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP"},
-  {p:"P002392",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",end:"Fazenda Alvorada, s/n, 3ª Lomba, Arapoti – PR",obra:true},
-  {p:"P002419",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP"},
-  {p:"P002420",c:"Judy Mary Fonseca Grando",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 09, Jardim Colonial, Castro – PR"},
-  {p:"P002401",c:"Clemente Lourenco Gerhards",cidade:"Castro",uf:"PR"},
-  {p:"P002113",c:"Wagner Muller Ribeiro",cidade:"Arapoti",uf:"PR"},
-  {p:"P002379",c:"Andrade Comercio de Cereais Ltda",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 300, Jardim Colonial, Castro – PR"},
-  {p:"P002306",c:"Pedreira Genaro Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Estrada Antiga Francisco Herculano de Lara, S/N, Jardim Carvalho, Ponta Grossa – PR"},
-  {p:"P001689",c:"Jan Ate de Jager",cidade:"Piraí do Sul",uf:"PR"},
-  {p:"P002404",c:"VPJ Comercio de Produtos Alimenticios Ltda",cidade:"Pirassununga",uf:"SP"},
-  {p:"P002412",c:"Carlos Alberto Mendes Mancilha",cidade:"Pouso Alto",uf:"MG"},
-  {p:"P001681",c:"Janio Luiz Pereira",cidade:"Ponta Grossa",uf:"PR"},
-  {p:"P001691",c:"Transportadora Begnini Ltda",cidade:"Carambeí",uf:"PR"},
+  {p:"P001003",c:"Kazuyoshi Wakimoto",cidade:"Piraí do Sul",uf:"PR",sit:"cliente precisa desmontar estrutura antiga",est:"14X16X5"},
+  {p:"P001032",c:"Hemisfério Sul Empreendimentos Imobiliários Ltda",cidade:"São Paulo",uf:"SP",sit:"material entregue, falta 1 carga de laje e montagem",est:"10,50X25X7,09+MEZANINO"},
+  {p:"P000346",c:"Luiz Cesar Spolador",cidade:"Ponta Grossa",uf:"PR",sit:"entregue pilares e braços",est:"20 x 40 x 5,50"},
+  {p:"P001792",c:"Thais Helena Saldanha",cidade:"Sengés",uf:"PR",sit:"aguardando definição do cliente sobre veneziana",est:"est. 12 x 24 x 5 + 314 m² placas 8 cm + 02 pilares extras"},
+  {p:"P001706",c:"Allison Maldonado",cidade:"Castro",uf:"PR",sit:"falta piso",est:"est. 8 x 17 x 3,50"},
+  {p:"P001855",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR",sit:"programar montagem: cliente tem que retirar materiais na frente da obra pra conseguir montar",est:"est. 22 x 15 x 6; 473 m² placas 8 cm; 6 pilares extras"},
+  {p:"P002051",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR",sit:"cliente vai alterar local da montagem, precisa conferir medidas in loco, avisar qdo forem para programar com funcionário/ tirando arvore",est:"est. 13 x 42 x 4 e 8,70 + viga de transição"},
+  {p:"P002078",c:"CEZ Engenharia Ltda",cidade:"Telêmaco Borba",uf:"PR",end:"Avenida Nações Unidas, S/N, Centro, Telêmaco Borba – PR",sit:"programar a montagem do U; previsão de início 24/03/25; expedição 17/03/25 inicio; falta 22 placa, 3 viga, 6 consoles inloco",est:"est 70 x 83 composta por pilares, placas, vigas"},
+  {p:"P002097",c:"Willem Johan Strijker",cidade:"Castro",uf:"PR",end:"Chácara Jardim do Eden, S/N, ABAPA, Castro – PR",sit:"Lucol fornece 0,65 m³ concreto fundação, se houver necessidade de retroescavadeira fica por conta do cliente e diferença de concreto tbm, previsão de inciar 25 a 30/08, prod.OK/ clinete vai terminar terraplanagem",est:"est. 13 x 48 x 5"},
+  {p:"P001891",c:"Denise Rodrigues Valle Fayad",cidade:"Quatiguá",uf:"PR",sit:"projeto aprovado 14/03/25; prod. OK,montagem WD OK, terraplenagem está OK para concluir o piso e parte civil programar piso/ contenções VAI INSTALAR CANZIL",est:"est. 6+18,85+6x50 lanternim + muretas + pilares extras; est. 8,90 x 50 lanternim + placas + fosso + escritório + tanque + farmácia + WC"},
+  {p:"P002180",c:"Neverton Rodrigues da Silva Auto Elétrica",cidade:"Telêmaco Borba",uf:"PR",end:"Rua Vereador José Ozório de Camargo, S/N, Socomim, Telêmaco Borba – PR",sit:"falta cobertura. 2 etapa fundação definida, falar com o cliente para providenciar a cortina de estaca vai ter alteração cliente vai ver com pedreiro",est:"bloco 11,50x30x6 + bloco 11,50x12,24x3 + 1 bloco 7x6x3 + 136 m² placas 12 cm + 44 m² placas 8 cm + 12 pilares extras +01 ampliação de cobertura de 13,00 m de largura x 6,00 m de comprimento, +01 ampliação de laje de 18,50 m largura x 5,00 m comprimento+ placas"},
+  {p:"P002187",c:"Alberto Reinaldo Los",cidade:"Carambeí",uf:"PR",sit:"falta 2 portao + pedreiro do cliente fez piso que faltava um pedaço acima da fossa cliente pediu revisao do telhado para limpeza TUDO OK TERMINOU",est:"est. Geminada 20,15+8,85 x 120 x 5,40, lanternim; vão 3 m FE/FU; muretas; pilares extras"},
+  {p:"P002277",c:"Romildo Dallarmi",cidade:"Castro",uf:"PR",sit:"tesourado falta cobrir vai cobrir 11/05 falta entrega tecnica",est:"Est. 6,90 x 23,70 x 4,50"},
+  {p:"P002309",c:"Camilo Miguel Barth",cidade:"Castro",uf:"PR",sit:"SEGUNDO FOTOS INSERIDAS EM RELATORIO DE OBRAS - FOI COBERTO NA DATA DE 18/05",est:"est. 6+12,40x12x6,30"},
+  {p:"P002307",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"falta entrega tecnica",est:"amp. 24,40+6,00 x 36 x 5 lanternim 24m"},
+  {p:"P002294",c:"Gerson Luis Zych",cidade:"Arapoti",uf:"PR",sit:"foi levantado as pl fossa , vai ir amanha 12/05 fazer cotenção+piso fazendo piso e fabricando portao",est:"est. 13+12,70+13 x 48 x 5,30; lanternim; 227 m² muretas; 22 pilares extras; canaleta 52 x 60 x0,60; 29 m² placas pista de transição lateral"},
+  {p:"P002291",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP",sit:"falta piso, cliente está fazendo hidraulica Marildo falou que é para ter alguma alteração de aberturas",est:"3 est. Geminada de 10,50 x 37,50 x 6; 3 escadas; 1334 m² placa parede 8 cm; 135 m² placa muro 8 cm; 108 m² placa muro 10 cm"},
+  {p:"P002313",c:"Boranelli Administradora de Bens Ltda",cidade:"Itapeva",uf:"SP",end:"Avenida Dona Paulina de Morais, 396, Jardim Maringá, Itapeva – SP",obra:true,sit:"fazendo acabamento; previsão de iniciar a montagem semana que vem; cliente precisa limpar o terreno para dar condição de trabalho, programar montagem cliente já limpou terreno 23/02 data prevista, em andamento a hélice contínua, montagem em andamento incio fund previsao de retorno na obra 15/03 em andamento montagem das tesouras metálicas vai ir na obra dia 13/05 revisao parte metalica, revisao da solda",est:"20 pilares , 700m de placa"},
+  {p:"P002295",c:"Tuvivas Participações Ltda (Marjan)",cidade:"São Paulo",uf:"SP",end:"Rua Vigário Taques Bitencourt, 242, Santo Amaro, São Paulo – SP",sit:"fundação ok, esta instalando  placas e vigas dia 13/04 parte metálica instalada e soldada, falta  calhas inicio 27/04 a 29/04 , cobertura 27/04 a 29/04, piso, varanda falta telhas , escada ver como será resolvido sera escada metalica cliente ficou de definir e escada sera faturado direto para cliente homero passou orçamento escada assinado aditivo escada",est:"est. 14,80 x 42,45 x 11,90; vigas travamento; 1126 m² placas; 1 lance escada"},
+  {p:"P002331",c:"Eltje Jan Rabbers",cidade:"Piraí do Sul",uf:"PR",sit:"montagem em andamento",est:"estrutura para suinos terminação"},
+  {p:"P002336",c:"Jennifer Camily da Silva Moreira",cidade:"Guaiçara",uf:"SP",sit:"fabrica",est:"01 ampliação de estrutura pré-fabricada de concreto armada de 12,00 x 12,00 m"},
+  {p:"P002314",c:"Luiz Fernando Rodrigues da Silva",cidade:"Ponta Grossa",uf:"PR",sit:"cobertura OK, piso ok entrega tecnica falta",est:"est.5x30x5 , + placa"},
+  {p:"P002346",c:"Marinus Hajen",cidade:"Arapoti",uf:"PR",end:"Chácara Linquinda, s/n, 2ª Lomba, Colônia Holandesa, Arapoti – PR",obra:true,sit:"20 placas,   já com a alteração de projeto fazendo fundação montagem em andamento",est:"2 EST. 30 m com placas"},
+  {p:"P002378",c:"Marinus Hagen Filho",cidade:"Arapoti",uf:"PR",sit:"falta terças pevisao essa semana",est:"est 5,00 x 15,00 m,"},
+  {p:"P002343",c:"Jose Carlos Oppis",cidade:"Araucária",uf:"PR",sit:"paralisado não esta liberado o terreno para montagem",est:"est. 11x19x4"},
+  {p:"P000619",c:"Marcos Krubnik",cidade:"Piraí do Sul",uf:"PR",end:"Rodovia PR 090, km 155, s/n, Campina do Butiá, Piraí do Sul – PR",obra:true,sit:"em montagem falta cobrir",est:"est.20x24x5"},
+  {p:"P002393",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"esta ok falta entrega tecnica",est:"Reforma cobertura para estrutura existente de 18,39 m por fora x 44,00 m"},
+  {p:"P002173",c:"Diego Felippe Geremias de Souza",cidade:"Promissão",uf:"SP",sit:"falta piso",est:"partes adicionais internos para compost"},
+  {p:"P002341",c:"Mario Gabriel Filho",cidade:"Taquarituba",uf:"SP",sit:"projeto esta ok tirar esquadro da obra vai amanha ou quarta feira tirar esquadro da obra",est:"EST. 24X24X8,5 +1390 m² de placas"},
+  {p:"P002347",c:"Sigmund Schartner",cidade:"Palmeira",uf:"PR",end:"Chácara Úrsula, s/n, Colônia Witmarsum, Palmeira – PR",obra:true,sit:"em montagem esta abrindo estrada para melhor acesso cliente pediu adicional da placa",est:"est. 23x30x6"},
+  {p:"P002356",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"Cobertura ok falta entrega tecnica",est:"est.8,5x 1,30x3,98"},
+  {p:"P002352",c:"Academia Fitshape Ltda",cidade:"Castro",uf:"PR",end:"Rua Coronel Vidal Martins de Oliveira, 677, Vila Rio Branco, Castro – PR",sit:"esta ok falta somente 2 rufos + piso ir na unibox para ver o laminado onde molhou e estufou falta piso adicional",est:"est. 4x21x3,20"},
+  {p:"P002345",c:"Luiz Fernando Rodrigues",cidade:"Ponta Grossa",uf:"PR",sit:"falta entrega tecnica",est:"est. 16,5x15x5 , + placas"},
+  {p:"P001682",c:"JFR Empreendimentos Imobiliarios Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Avenida Visconde de Taunay, 1417, Ronda, Ponta Grossa – PR",sit:"4 escada, 6 pilar , 40 placas cliente vai executar fundação precisa de conferencia",est:"est 10x26,50x9,81+90 m² de placas"},
+  {p:"P002367",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",sit:"Falta 3 pilar pequeno,  11 mureta  inicio montagem 13/04, montagem em andamento vai ter ajuste projeto vai ter alteração em 2 pilar, ver se  vai ter fixadores para placa",est:"est. 2,5+12,40+12,7+12,40+2,5x84x4,5"},
+  {p:"P002373",c:"SRB Consultoria e Assessoria Empresarial Ltda",cidade:"Curitiba",uf:"PR",end:"Rua Chile, 1791, Rebouças, Curitiba – PR",sit:"produção OK, acabamento ok, cliente vai montar sem alvará previsao dia 06/06 montagem",est:"(est 3,79x11,10x3,55) (10x11,50x5,10)"},
+  {p:"P002364",c:"Lilian da Rosa Weigert Benazzi Ltda",cidade:"Jaguariaíva",uf:"PR",end:"Rua Rovilio Christianetti, 475, Distrito Industrial Ari Fanchin, Jaguariaíva – PR",obra:true,sit:"acabamento ok e produção ok programar montagem",est:"est. 8x10x3+2,5"},
+  {p:"P002358",c:"Anderson Santos",cidade:"Castro",uf:"PR",end:"Avenida das Flores, S/N, Jardim Termas Riviera, Castro – PR",sit:"falta cobrir",est:"est. 21x25 36,90 x7,5"},
+  {p:"P002368",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"falta cobrir",est:"est. 11x60x3,75 e 3,50"},
+  {p:"P002360",c:"Daniel Leonardo Los",cidade:"Carambeí",uf:"PR",end:"Chácara Talismã, s/n, Bairro Catanduva, Carambeí – PR",obra:true,sit:"em montagem, falta cobrir",est:"est. 18x30x6"},
+  {p:"P002354",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"falta entrega tecnica",est:"est 24,35x24+ um est 14,7x36"},
+  {p:"P002416",c:"Adriaan Frederik Kok",cidade:"Arapoti",uf:"PR",sit:"fora 18/05 montar",est:"01 alpendre metálico de 3,00 x 6,00 m, com tesouras metálicas,"},
+  {p:"P001686",c:"Paroquia Senhor Menino Deus",cidade:"Piraí do Sul",uf:"PR",end:"Capela São Pedro, S/N, Tijuco Preto, Castro – PR",sit:"entrega tecnica",est:"est.12x10x4"},
+  {p:"P002357",c:"Fabiano Pauls",cidade:"Palmeira",uf:"PR",end:"Chácara Granja CP Rocky, s/n, Colônia Witmarsum, Palmeira – PR",obra:true,sit:"em montagem",est:"est.32x48x4"},
+  {p:"P002350",c:"Paulo Sergio Assunção",cidade:"Tibagi",uf:"PR",end:"Fazenda Santa Branca, s/n, Bairro Alto do Amparo, Tibagi – PR",obra:true,sit:"falta 70  pilar , 75 placas - SENDO REALIZADO REFORÇO METALICO - previsão 21/05",est:"466 m² placas +126 pilares para fixação de placas"},
+  {p:"P001685",c:"Viverti Apucarana 03 Incorporação Imobiliaria SPE Ltda",cidade:"Apucarana",uf:"PR",end:"Rua José Ferragine, S/N, Conj. Habitacional Solo Sagrado, Apucarana – PR",obra:true,sit:"quadra 05 cliente atrasou a fundação; quadra 44 falta ok; quadra 10 esta na fabrica; guile vai montar essa semana em  montagem quadra 05",est:"muros pré fabricados"},
+  {p:"P002395",c:"Zero Residuos Ltda",cidade:"Ponta Grossa",uf:"PR",sit:"vai ter ajuste pilar metalico para fechamento",est:"01 alpendre de 10,40 x 1,60 m"},
+  {p:"P002361",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"ok produção e acab ok, vai mexer na terraplanagem",est:"01 base de caixa d’água de 5,00 largura x 10,00 m comprimento x 5,30 m altura até a laje"},
+  {p:"P002380",c:"Luiz Jose Sguario Neto / Veneto Participações",cidade:"Itapeva",uf:"SP",end:"Rodovia Governador Mário Covas, S/N, Ribeirão Fundo, Itapeva – SP",sit:"acabamentos ok previsao montagem final do mês 05",est:"est. 10x40x6"},
+  {p:"P001687",c:"Otoniel de Jesus",cidade:"Ponta Grossa",uf:"PR",sit:"falta 1 pl",est:"EST 12X17X6 , 370m2 de placa para fechamentos de paredee platibanda espessura 8cm."},
+  {p:"P001684",c:"William Benke",cidade:"Castro",uf:"PR",sit:"fabrica",est:"5 placas em concreto armado de 6,00 x 1,50 x 0,12 m frete para entrega"},
+  {p:"P002117",c:"Unicesumar",cidade:"Ponta Grossa",uf:"PR",end:"Rua Desembargador Westphalen, 60, Oficinas, Ponta Grossa – PR",sit:"em andamento produção; ; pilar em pe instalando vigas e lajes e placas  ajuste projeto ok e produzidos",est:"4 Pavimentos 26,30x24,70"},
+  {p:"P002321",c:"Mateus de Oliveira Silvestre de Moraes",cidade:"Palmital",uf:"SP",end:"Rua Jesus Ortis Toral, 227/239, Distrito Industrial Basílio, Palmital – SP",sit:"concreto e trator por conta do cliente para fundação previsao montagem 19/05 gemes irem na obra amanha 12/05 bater esquadro",est:"est. 20x48x6,9"},
+  {p:"P002391",c:"JRW Veiculos Ltda",cidade:"Telêmaco Borba",uf:"PR",sit:"Falta  1 escadas,44pl",est:"est 9,90 x 24,00 m + 387 m² placas"},
+  {p:"P002254",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP",sit:"ATENÇÃO AOS PRAZOS esta verificando sobre a obra foi passado alteraçãoes para ver se vão aprovar, marcado reunião na terça dia 28/04 para definir",est:"est estacionamento 3 andares 22,30 x 23,95 x 2,85+2,85+2,85; vigas"},
+  {p:"P002417",c:"Centro de Treinamento para Pecuaristas",cidade:"Castro",uf:"PR",end:"Fazenda Capão do Cipó, S/N, Maracanã, Castro – PR",sit:"fabrica",est:"est de 9,00 x 24,00 m"},
+  {p:"P002410",c:"Tiago Dias de Oliveira",cidade:"Itapeva",uf:"SP",sit:"engenharia",est:"9 pilar , 62m² de placa"},
+  {p:"P002396",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP",sit:"fabrica",est:"est 25,00 x 12,00 m + 243 m²  placas"},
+  {p:"P002392",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",end:"Fazenda Alvorada, s/n, 3ª Lomba, Arapoti – PR",obra:true,sit:"fabricar placas proxima semana",est:"est 25,00 x 64,25 m+ 597 m² placas"},
+  {p:"P002419",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP",sit:"engenharia",est:"EST de 10,00 x 42,00 m x 5 altura com placas + 01 estrutura  fossa dejetos circular de 13 de diâmetro x 3 altura COM PLACAS"},
+  {p:"P002420",c:"Judy Mary Fonseca Grando",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 09, Jardim Colonial, Castro – PR",sit:"engenharia",est:"est 10,00 x 20,00 m com placas"},
+  {p:"P002401",c:"Clemente Lourenco Gerhards",cidade:"Castro",uf:"PR",sit:"engenharia",est:"est 17,00 x 42,00 m"},
+  {p:"P002113",c:"Wagner Muller Ribeiro",cidade:"Arapoti",uf:"PR",sit:"cliente vai aguardar liberação do alvará",est:"est. 3 andares 24,25 x 18,90 x 4,23+6,55+4,38; 3 escadas pré-fabricadas; 931 m² placas;"},
+  {p:"P002379",c:"Andrade Comercio de Cereais Ltda",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 300, Jardim Colonial, Castro – PR",sit:"falta 5 pilar e 38 pl",est:"est 17,50 x 30,00 m, + 258 m²  placas +•01 alpendre metálico de 18,80 m x 4,00 m"},
+  {p:"P002306",c:"Pedreira Genaro Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Estrada Antiga Francisco Herculano de Lara, S/N, Jardim Carvalho, Ponta Grossa – PR",sit:"na engenharia",est:"est 11,20 x 28,00 m + 395,06 m²  placas"},
+  {p:"P001689",c:"Jan Ate de Jager",cidade:"Piraí do Sul",uf:"PR",sit:"fabrica",est:"est 25,00 x 48,00 m + 516,28 m² placas"},
+  {p:"P002404",c:"VPJ Comercio de Produtos Alimenticios Ltda",cidade:"Pirassununga",uf:"SP",sit:"engenharia",est:"EST 14,00 x 62,00 m+466 m²  PLACAS"},
+  {p:"P002412",c:"Carlos Alberto Mendes Mancilha",cidade:"Pouso Alto",uf:"MG",sit:"engenharia",est:"EST 17,30 x 54,00 m + PLACAS"},
+  {p:"P001681",c:"Janio Luiz Pereira",cidade:"Ponta Grossa",uf:"PR",sit:"fabrica",est:"EST 2 ANDARES , AREAR UTEL 218 + EST VAO LIVRE 67+ 01 estrutura para base de caixa d agua com fechamento de paredes+placas"},
+  {p:"P001691",c:"Transportadora Begnini Ltda",cidade:"Carambeí",uf:"PR",sit:"engenharia",est:"est 13,9 x 24 x 7m totalizando 326m²"},
   {p:"P001692",c:"Jose Carlos Regatiere",cidade:"Castro",uf:"PR"}
 ];
 
@@ -437,17 +474,84 @@ function aplicar(r) {
   document.getElementById('af-cliente').value = r.c;
   document.getElementById('af-local').value = r.cidade + ' / ' + r.uf;
   document.getElementById('af-1').style.display = 'grid';
+  var box = document.getElementById('loc-box');
+  var head = document.getElementById('loc-head');
+  var txt = document.getElementById('loc-text');
+  var btn = document.getElementById('loc-btn');
+  var aviso = document.getElementById('loc-aviso');
+  box.classList.add('show');
   if (r.end) {
     document.getElementById('af-end').value = r.end;
     document.getElementById('af-2').style.display = 'grid';
     document.getElementById('badge-obra').style.display = r.obra ? 'inline-block' : 'none';
-    var ml = document.getElementById('maps-link');
-    ml.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.end);
-    ml.style.display = 'inline-block';
+    box.classList.add('exata');
+    box.classList.remove('cidade');
+    head.textContent = '📍 Localização exata';
+    txt.textContent = r.end;
+    btn.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.end);
+    btn.textContent = 'Abrir endereço no Google Maps';
+    aviso.style.display = 'none';
   } else {
+    document.getElementById('af-end').value = '';
     document.getElementById('af-2').style.display = 'none';
     document.getElementById('badge-obra').style.display = 'none';
-    document.getElementById('maps-link').style.display = 'none';
+    box.classList.add('cidade');
+    box.classList.remove('exata');
+    head.textContent = '📍 Localização aproximada';
+    txt.textContent = r.cidade + ' / ' + r.uf;
+    btn.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(r.cidade + ', ' + r.uf + ', Brasil');
+    btn.textContent = 'Abrir cidade no Google Maps';
+    aviso.style.display = 'block';
+  }
+
+  // Situação atual (coluna montagem) — recolhido
+  var sitWrap = document.getElementById('sit-wrap');
+  var sitBody = document.getElementById('sit-body');
+  var sitToggle = document.getElementById('sit-toggle');
+  if (r.sit) {
+    sitBody.textContent = r.sit;
+    sitBody.style.display = 'none';
+    sitToggle.innerHTML = '▸ Ver situação atual <span style="font-weight:500;color:#888">(atualizada semanalmente)</span>';
+    sitWrap.classList.add('show');
+  } else {
+    sitWrap.classList.remove('show');
+  }
+
+  // Tipo de obra (coluna estrutura) — recolhido
+  var tipoWrap = document.getElementById('tipo-wrap');
+  var tipoBody = document.getElementById('tipo-body');
+  var tipoToggle = document.getElementById('tipo-toggle');
+  if (r.est) {
+    tipoBody.textContent = r.est;
+    tipoBody.style.display = 'none';
+    tipoToggle.textContent = '▸ Ver tipo de obra / o que está comercializado';
+    tipoWrap.classList.add('show');
+  } else {
+    tipoWrap.classList.remove('show');
+  }
+}
+
+function toggleSit() {
+  var body = document.getElementById('sit-body');
+  var toggle = document.getElementById('sit-toggle');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    toggle.innerHTML = '▾ Ocultar situação atual';
+  } else {
+    body.style.display = 'none';
+    toggle.innerHTML = '▸ Ver situação atual <span style="font-weight:500;color:#888">(atualizada semanalmente)</span>';
+  }
+}
+
+function toggleTipo() {
+  var body = document.getElementById('tipo-body');
+  var toggle = document.getElementById('tipo-toggle');
+  if (body.style.display === 'none') {
+    body.style.display = 'block';
+    toggle.textContent = '▾ Ocultar tipo de obra';
+  } else {
+    body.style.display = 'none';
+    toggle.textContent = '▸ Ver tipo de obra / o que está comercializado';
   }
 }
 
@@ -456,8 +560,20 @@ function limparCampos() {
   document.getElementById('match-box').style.display = 'none';
   document.getElementById('af-1').style.display = 'none';
   document.getElementById('af-2').style.display = 'none';
-  document.getElementById('maps-link').style.display = 'none';
+  var lb = document.getElementById('loc-box'); if (lb) { lb.className = 'loc-box'; }
+  var sb = document.getElementById('sit-wrap'); if (sb) sb.classList.remove('show');
+  var tw = document.getElementById('tipo-wrap'); if (tw) tw.classList.remove('show');
   document.getElementById('badge-obra').style.display = 'none';
+}
+
+function trocarCliente() {
+  document.getElementById('inp-pedido').value = '';
+  document.getElementById('inp-nome').value = '';
+  document.getElementById('inp-cidade').value = '';
+  var al = document.getElementById('autocomplete-list'); if (al) al.style.display = 'none';
+  var cl = document.getElementById('cidade-list'); if (cl) cl.style.display = 'none';
+  limparCampos();
+  document.getElementById('inp-pedido').focus();
 }
 
 var cnt = {fundacao:0,terraplenagem:0,montagem:0,estrutura:0,calhas:0,piso:0,terceiros:0,outros:0};
@@ -467,17 +583,36 @@ function add(e) {
   var div = document.createElement('div');
   div.className = 'membro-row';
   div.id = id;
-  div.innerHTML = '<input type="text" placeholder="Nome do membro"/><button class="btn-rm" onclick="document.getElementById(\'' + id + '\').remove()">×</button>';
+  div.innerHTML = '<input type="text" placeholder="Nome do membro" oninput="atualizarMarcas()"/><button class="btn-rm" onclick="document.getElementById(\'' + id + '\').remove();atualizarMarcas()">×</button>';
   document.getElementById('m-' + e).appendChild(div);
   if (e === 'outros') document.getElementById('outros-det-wrap').style.display = 'block';
   if (e === 'terceiros') document.getElementById('terceiros-det-wrap').style.display = 'block';
 }
 
 function aba(e, btn) {
-  document.querySelectorAll('.panel').forEach(function(p){ p.className='panel'; });
-  document.querySelectorAll('.tab').forEach(function(t){ t.className='tab'; });
-  document.getElementById('p-' + e).className = 'panel show';
-  btn.className = 'tab active';
+  var panel = document.getElementById('p-' + e);
+  var aberto = panel.classList.contains('show');
+  if (aberto) {
+    panel.className = 'panel' + (temEquipe(e) ? ' tem-equipe' : '');
+    btn.classList.remove('active');
+  } else {
+    panel.className = 'panel show';
+    btn.classList.add('active');
+  }
+}
+
+function temEquipe(e) {
+  return membros(e).length > 0;
+}
+
+// Atualiza a marca verde nas abas conforme membros preenchidos
+function atualizarMarcas() {
+  ['fundacao','terraplenagem','montagem','estrutura','calhas','piso','terceiros','outros'].forEach(function(e){
+    var btn = document.querySelector('.tab[data-etapa="'+e+'"]');
+    if (!btn) return;
+    if (temEquipe(e)) btn.classList.add('preenchida');
+    else btn.classList.remove('preenchida');
+  });
 }
 
 function chk(el) { el.classList.toggle('active'); }
@@ -555,7 +690,12 @@ function gerarPDF() {
   var objs = Array.from(document.querySelectorAll('#checks .chk.active')).map(function(el){ return el.getAttribute('data-val'); });
   var equipe = equipeLinhas();
   var emObra = atual && atual.obra;
-  var mapsUrl = end ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(end) : '';
+  var sitVal = atual && atual.sit ? atual.sit : '';
+  var estVal = atual && atual.est ? atual.est : '';
+  var cidadeUf = atual ? (atual.cidade + ', ' + atual.uf + ', Brasil') : local;
+  var mapsUrl = end
+    ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(end)
+    : 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(cidadeUf);
 
   var equipeHtml = equipe.length
     ? equipe.map(function(e){ return '<div class="el"><span class="et">'+e.etapa+'</span><span>'+e.membros+(e.detalhe?' <em>('+e.detalhe+')</em>':'')+'</span></div>'; }).join('')
@@ -606,9 +746,11 @@ function gerarPDF() {
   +'<div class="header"><div class="hl"><h1>Relatório Técnico</h1><p>Vistoria e Acompanhamento de Obras</p></div><div class="hr"><strong>Grupo JMR</strong>Data: <strong>'+dataFmt+'</strong></div></div>'
   +'<div class="sec"><div class="st">Identificação'+(emObra?'<span class="ob">● Obra em andamento</span>':'')+'</div>'
   +'<div class="g2"><div class="f"><div class="fl">Pedido / Contrato</div><div class="fv">'+pedido+'</div></div><div class="f"><div class="fl">Cliente</div><div class="fv">'+cliente+'</div></div></div>'
-  +'<div class="g2"><div class="f"><div class="fl">Empreendimento</div><div class="fv">'+empr+'</div></div><div class="f"><div class="fl">Município / Estado</div><div class="fv">'+local+'</div></div></div>'
+  +'<div class="g2"><div class="f"><div class="fl">Empreendimento</div><div class="fv">'+empr+'</div></div><div class="f"><div class="fl">Município / Estado</div><div class="fv">'+local+(end?'':'<br><a href="'+mapsUrl+'" target="_blank" style="color:#185FA5;font-size:9pt;font-weight:600;text-decoration:none;margin-top:4px;display:inline-block">📍 Ver localização no mapa</a>')+'</div></div></div>'
   +endHtml
+  +(estVal?'<div class="f"><div class="fl">Tipo de obra / comercializado</div><div class="fv" style="font-weight:500">'+estVal+'</div></div>':'')
   +'</div>'
+  +(sitVal?'<div class="sec"><div class="st">Situação atual</div><div style="font-size:10pt;line-height:1.6;color:#111;padding:9px 12px;background:#eff6ff;border:0.75pt solid #bfdbfe;border-radius:5px">'+sitVal.replace(/\n/g,'<br>')+'</div></div>':'')
   +'<div class="sec"><div class="st">Dados da visita</div>'
   +'<div class="g3"><div class="f"><div class="fl">Data</div><div class="fv">'+dataFmt+'</div></div><div class="f"><div class="fl">Responsável técnico</div><div class="fv">Pablo Rodrigo Ribeiro</div></div><div class="f"><div class="fl">CREA</div><div class="fv">83.338/D-PR</div></div></div>'
   +'</div>'
@@ -621,7 +763,7 @@ function gerarPDF() {
   +'</div></body></html>';
 
   // inject print button into the html before opening
-  var printBtn = '<div id="print-bar" style="position:fixed;top:0;left:0;right:0;z-index:999;background:#1a3d6b;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.3);print-color-adjust:exact;">'+'<span style="color:#fff;font-size:14px;font-weight:600">Grupo JMR — Relatório Técnico</span>'+'<button onclick="window.print()" style="background:#fff;color:#1a3d6b;border:none;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px">&#128438; Salvar como PDF</button>'+'</div><div style="height:60px"></div>';
+  var printBtn = '<div id="print-bar" style="position:fixed;top:0;left:0;right:0;z-index:999;background:#1a3d6b;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.3);print-color-adjust:exact;">'+'<button onclick="voltarApp()" style="background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.6);padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">&#8592; Voltar ao app</button>'+'<span style="color:#fff;font-size:13px;font-weight:600;flex:1;text-align:center">Grupo JMR — Relatório Técnico</span>'+'<button onclick="window.print()" style="background:#fff;color:#1a3d6b;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap">&#128438; Salvar como PDF</button>'+'</div><div style="height:60px"></div>'+'<scr'+'ipt>function voltarApp(){ try{ window.close(); }catch(e){} setTimeout(function(){ if(!window.closed){ if(history.length>1){ history.back(); } else { location.href="'+location.href+'"; } } }, 150); }</scr'+'ipt>';
   var printStyle = '<style>@media print{#print-bar{display:none!important}.page{padding-top:14mm}}</style>';
   var finalHtml = html.replace('</head>', printStyle+'</head>').replace('<body>', '<body>'+printBtn);
   var blob = new Blob([finalHtml], {type:'text/html'});
