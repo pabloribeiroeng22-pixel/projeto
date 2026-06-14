@@ -58,6 +58,22 @@ textarea{resize:vertical;min-height:90px}
 .tipo-toggle{width:100%;text-align:left;background:#f8fafc;border:1px solid #d0d8e4;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:#555;cursor:pointer}
 .tipo-toggle:hover{background:#eef2f7}
 .tipo-body{margin-top:8px;padding:12px 15px;background:#fafafa;border:1px solid #e5e7eb;border-radius:8px;font-size:13.5px;color:#333;line-height:1.45}
+.tl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#1a3d6b;margin-bottom:12px}
+.tl-track{display:flex;flex-direction:column;gap:0}
+.tl-step{display:flex;gap:12px;position:relative;padding-bottom:16px}
+.tl-step:last-child{padding-bottom:0}
+.tl-step::before{content:'';position:absolute;left:11px;top:24px;bottom:0;width:2px;background:#dde5f0}
+.tl-step:last-child::before{display:none}
+.tl-dot{flex-shrink:0;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;z-index:1}
+.tl-dot.done{background:#16a34a}
+.tl-dot.active{background:#185FA5}
+.tl-dot.pending{background:#cbd5e1}
+.tl-dot.late{background:#dc2626}
+.tl-info{flex:1;padding-top:1px}
+.tl-fase{font-size:13.5px;font-weight:700;color:#1a3d6b}
+.tl-status{font-size:12.5px;color:#555;margin-top:1px}
+.tl-pdf{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:12.5px;color:#444;cursor:pointer;background:#f6f8fb;padding:9px 12px;border-radius:8px;border:1px solid #e3e9f2}
+.tl-pdf input{width:16px;height:16px;cursor:pointer}
 .sig-wrap{position:relative;width:100%;border:2px dashed #c5cfdd;border-radius:10px;background:#fcfdff;margin-top:6px;touch-action:none;overflow:hidden}
 .sig-canvas{display:block;width:100%;height:200px;cursor:crosshair}
 .sig-placeholder{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#c0c8d4;font-size:15px;pointer-events:none;user-select:none}
@@ -186,6 +202,12 @@ textarea{resize:vertical;min-height:90px}
   <div class="tipo-wrap" id="tipo-wrap">
     <button type="button" class="tipo-toggle" id="tipo-toggle" onclick="toggleTipo()">▸ Ver tipo de obra / o que está comercializado</button>
     <div class="tipo-body" id="tipo-body" style="display:none"></div>
+  </div>
+
+  <div id="tl-wrap" style="display:none;margin-top:14px">
+    <div class="tl-title">📅 Linha do tempo da obra</div>
+    <div id="tl-track"></div>
+    <label class="tl-pdf"><input type="checkbox" id="tl-no-pdf"/> Incluir esta linha do tempo no PDF enviado ao cliente</label>
   </div>
 
   <div class="field-row c1">
@@ -395,77 +417,77 @@ textarea{resize:vertical;min-height:90px}
 
 <script>
 var DB = [
-  {p:"P001003",c:"Kazuyoshi Wakimoto",cidade:"Piraí do Sul",uf:"PR",sit:"cliente precisa desmontar estrutura antiga",est:"14X16X5"},
-  {p:"P001032",c:"Hemisfério Sul Empreendimentos Imobiliários Ltda",cidade:"São Paulo",uf:"SP",sit:"material entregue, falta 1 carga de laje e montagem",est:"10,50X25X7,09+MEZANINO"},
-  {p:"P000346",c:"Luiz Cesar Spolador",cidade:"Ponta Grossa",uf:"PR",sit:"entregue pilares e braços",est:"20 x 40 x 5,50"},
-  {p:"P001792",c:"Thais Helena Saldanha",cidade:"Sengés",uf:"PR",sit:"aguardando definição do cliente sobre veneziana",est:"est. 12 x 24 x 5 + 314 m² placas 8 cm + 02 pilares extras"},
-  {p:"P001706",c:"Allison Maldonado",cidade:"Castro",uf:"PR",sit:"falta piso",est:"est. 8 x 17 x 3,50"},
-  {p:"P001855",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR",sit:"programar montagem: cliente tem que retirar materiais na frente da obra pra conseguir montar",est:"est. 22 x 15 x 6; 473 m² placas 8 cm; 6 pilares extras"},
-  {p:"P002051",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR",sit:"cliente vai alterar local da montagem, precisa conferir medidas in loco, avisar qdo forem para programar com funcionário/ tirando arvore",est:"est. 13 x 42 x 4 e 8,70 + viga de transição"},
-  {p:"P002078",c:"CEZ Engenharia Ltda",cidade:"Telêmaco Borba",uf:"PR",end:"Avenida Nações Unidas, S/N, Centro, Telêmaco Borba – PR",sit:"programar a montagem do U; previsão de início 24/03/25; expedição 17/03/25 inicio; falta 22 placa, 3 viga, 6 consoles inloco",est:"est 70 x 83 composta por pilares, placas, vigas"},
-  {p:"P002097",c:"Willem Johan Strijker",cidade:"Castro",uf:"PR",end:"Chácara Jardim do Eden, S/N, ABAPA, Castro – PR",sit:"Lucol fornece 0,65 m³ concreto fundação, se houver necessidade de retroescavadeira fica por conta do cliente e diferença de concreto tbm, previsão de inciar 25 a 30/08, prod.OK/ clinete vai terminar terraplanagem",est:"est. 13 x 48 x 5"},
-  {p:"P001891",c:"Denise Rodrigues Valle Fayad",cidade:"Quatiguá",uf:"PR",sit:"projeto aprovado 14/03/25; prod. OK,montagem WD OK, terraplenagem está OK para concluir o piso e parte civil programar piso/ contenções VAI INSTALAR CANZIL",est:"est. 6+18,85+6x50 lanternim + muretas + pilares extras; est. 8,90 x 50 lanternim + placas + fosso + escritório + tanque + farmácia + WC"},
-  {p:"P002180",c:"Neverton Rodrigues da Silva Auto Elétrica",cidade:"Telêmaco Borba",uf:"PR",end:"Rua Vereador José Ozório de Camargo, S/N, Socomim, Telêmaco Borba – PR",sit:"falta cobertura. 2 etapa fundação definida, falar com o cliente para providenciar a cortina de estaca vai ter alteração cliente vai ver com pedreiro",est:"bloco 11,50x30x6 + bloco 11,50x12,24x3 + 1 bloco 7x6x3 + 136 m² placas 12 cm + 44 m² placas 8 cm + 12 pilares extras +01 ampliação de cobertura de 13,00 m de largura x 6,00 m de comprimento, +01 ampliação de laje de 18,50 m largura x 5,00 m comprimento+ placas"},
-  {p:"P002187",c:"Alberto Reinaldo Los",cidade:"Carambeí",uf:"PR",sit:"falta 2 portao + pedreiro do cliente fez piso que faltava um pedaço acima da fossa cliente pediu revisao do telhado para limpeza TUDO OK TERMINOU",est:"est. Geminada 20,15+8,85 x 120 x 5,40, lanternim; vão 3 m FE/FU; muretas; pilares extras"},
+  {p:"P001003",c:"Kazuyoshi Wakimoto",cidade:"Piraí do Sul",uf:"PR",sit:"cliente precisa desmontar estrutura antiga",est:"14X16X5",pprod:"2017-12-12",pmont:"2017-12-12",pconcl:"2018-01-11",montsrc:"prazo",aprov:"",prod:""},
+  {p:"P001032",c:"Hemisfério Sul Empreendimentos Imobiliários Ltda",cidade:"São Paulo",uf:"SP",sit:"material entregue, falta 1 carga de laje e montagem",est:"10,50X25X7,09+MEZANINO",pprod:"2018-06-14",pmont:"2018-06-14",pconcl:"2018-07-14",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P000346",c:"Luiz Cesar Spolador",cidade:"Ponta Grossa",uf:"PR",sit:"entregue pilares e braços",est:"20 x 40 x 5,50",pprod:"2018-10-09",pmont:"2029-10-09",pconcl:"2029-11-08",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P001792",c:"Thais Helena Saldanha",cidade:"Sengés",uf:"PR",sit:"aguardando definição do cliente sobre veneziana",est:"est. 12 x 24 x 5 + 314 m² placas 8 cm + 02 pilares extras",pprod:"2023-03-17",pmont:"2023-04-24",pconcl:"2023-05-24",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P001706",c:"Allison Maldonado",cidade:"Castro",uf:"PR",sit:"falta piso",est:"est. 8 x 17 x 3,50",pprod:"2023-09-28",pmont:"2023-09-28",pconcl:"2023-10-28",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P001855",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR",sit:"programar montagem: cliente tem que retirar materiais na frente da obra pra conseguir montar",est:"est. 22 x 15 x 6; 473 m² placas 8 cm; 6 pilares extras",pprod:"2024-09-11",pmont:"2024-09-11",pconcl:"2024-10-11",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002051",c:"Evento Construtora de Obras Eireli",cidade:"Castro",uf:"PR",sit:"cliente vai alterar local da montagem, precisa conferir medidas in loco, avisar qdo forem para programar com funcionário/ tirando arvore",est:"est. 13 x 42 x 4 e 8,70 + viga de transição",pprod:"2024-10-25",pmont:"2024-12-04",pconcl:"2025-01-03",montsrc:"prazo",aprov:"Enviado",prod:"Não iniciou"},
+  {p:"P002078",c:"CEZ Engenharia Ltda",cidade:"Telêmaco Borba",uf:"PR",end:"Avenida Nações Unidas, S/N, Centro, Telêmaco Borba – PR",sit:"programar a montagem do U; previsão de início 24/03/25; expedição 17/03/25 inicio; falta 22 placa, 3 viga, 6 consoles inloco",est:"est 70 x 83 composta por pilares, placas, vigas",pprod:"",pmont:"",pconcl:"",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002097",c:"Willem Johan Strijker",cidade:"Castro",uf:"PR",end:"Chácara Jardim do Eden, S/N, ABAPA, Castro – PR",sit:"Lucol fornece 0,65 m³ concreto fundação, se houver necessidade de retroescavadeira fica por conta do cliente e diferença de concreto tbm, previsão de inciar 25 a 30/08, prod.OK/ clinete vai terminar terraplanagem",est:"est. 13 x 48 x 5",pprod:"2025-04-11",pmont:"2025-05-13",pconcl:"2025-06-12",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P001891",c:"Denise Rodrigues Valle Fayad",cidade:"Quatiguá",uf:"PR",sit:"projeto aprovado 14/03/25; prod. OK,montagem WD OK, terraplenagem está OK para concluir o piso e parte civil programar piso/ contenções VAI INSTALAR CANZIL",est:"est. 6+18,85+6x50 lanternim + muretas + pilares extras; est. 8,90 x 50 lanternim + placas + fosso + escritório + tanque + farmácia + WC",pprod:"2025-05-02",pmont:"2025-06-16",pconcl:"2025-07-16",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002180",c:"Neverton Rodrigues da Silva Auto Elétrica",cidade:"Telêmaco Borba",uf:"PR",end:"Rua Vereador José Ozório de Camargo, S/N, Socomim, Telêmaco Borba – PR",sit:"falta cobertura. 2 etapa fundação definida, falar com o cliente para providenciar a cortina de estaca vai ter alteração cliente vai ver com pedreiro",est:"bloco 11,50x30x6 + bloco 11,50x12,24x3 + 1 bloco 7x6x3 + 136 m² placas 12 cm + 44 m² placas 8 cm + 12 pilares extras +01 ampliação de cobertura de 13,00 m de largura x 6,00 m de comprimento, +01 ampliação de laje de 18,50 m largura x 5,00 m comprimento+ placas",pprod:"2025-05-30",pmont:"2025-07-10",pconcl:"2025-08-09",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002187",c:"Alberto Reinaldo Los",cidade:"Carambeí",uf:"PR",sit:"falta 2 portao + pedreiro do cliente fez piso que faltava um pedaço acima da fossa cliente pediu revisao do telhado para limpeza TUDO OK TERMINOU",est:"est. Geminada 20,15+8,85 x 120 x 5,40, lanternim; vão 3 m FE/FU; muretas; pilares extras",pprod:"2025-06-13",pmont:"2025-07-29",pconcl:"2025-08-28",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
   {p:"P002277",c:"Romildo Dallarmi",cidade:"Castro",uf:"PR",sit:"tesourado falta cobrir vai cobrir 11/05 falta entrega tecnica",est:"Est. 6,90 x 23,70 x 4,50"},
-  {p:"P002309",c:"Camilo Miguel Barth",cidade:"Castro",uf:"PR",sit:"SEGUNDO FOTOS INSERIDAS EM RELATORIO DE OBRAS - FOI COBERTO NA DATA DE 18/05",est:"est. 6+12,40x12x6,30"},
-  {p:"P002307",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"falta entrega tecnica",est:"amp. 24,40+6,00 x 36 x 5 lanternim 24m"},
-  {p:"P002294",c:"Gerson Luis Zych",cidade:"Arapoti",uf:"PR",sit:"foi levantado as pl fossa , vai ir amanha 12/05 fazer cotenção+piso fazendo piso e fabricando portao",est:"est. 13+12,70+13 x 48 x 5,30; lanternim; 227 m² muretas; 22 pilares extras; canaleta 52 x 60 x0,60; 29 m² placas pista de transição lateral"},
-  {p:"P002291",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP",sit:"falta piso, cliente está fazendo hidraulica Marildo falou que é para ter alguma alteração de aberturas",est:"3 est. Geminada de 10,50 x 37,50 x 6; 3 escadas; 1334 m² placa parede 8 cm; 135 m² placa muro 8 cm; 108 m² placa muro 10 cm"},
-  {p:"P002313",c:"Boranelli Administradora de Bens Ltda",cidade:"Itapeva",uf:"SP",end:"Avenida Dona Paulina de Morais, 396, Jardim Maringá, Itapeva – SP",obra:true,sit:"fazendo acabamento; previsão de iniciar a montagem semana que vem; cliente precisa limpar o terreno para dar condição de trabalho, programar montagem cliente já limpou terreno 23/02 data prevista, em andamento a hélice contínua, montagem em andamento incio fund previsao de retorno na obra 15/03 em andamento montagem das tesouras metálicas vai ir na obra dia 13/05 revisao parte metalica, revisao da solda",est:"20 pilares , 700m de placa"},
-  {p:"P002295",c:"Tuvivas Participações Ltda (Marjan)",cidade:"São Paulo",uf:"SP",end:"Rua Vigário Taques Bitencourt, 242, Santo Amaro, São Paulo – SP",sit:"fundação ok, esta instalando  placas e vigas dia 13/04 parte metálica instalada e soldada, falta  calhas inicio 27/04 a 29/04 , cobertura 27/04 a 29/04, piso, varanda falta telhas , escada ver como será resolvido sera escada metalica cliente ficou de definir e escada sera faturado direto para cliente homero passou orçamento escada assinado aditivo escada",est:"est. 14,80 x 42,45 x 11,90; vigas travamento; 1126 m² placas; 1 lance escada"},
-  {p:"P002331",c:"Eltje Jan Rabbers",cidade:"Piraí do Sul",uf:"PR",sit:"montagem em andamento",est:"estrutura para suinos terminação"},
-  {p:"P002336",c:"Jennifer Camily da Silva Moreira",cidade:"Guaiçara",uf:"SP",sit:"fabrica",est:"01 ampliação de estrutura pré-fabricada de concreto armada de 12,00 x 12,00 m"},
+  {p:"P002309",c:"Camilo Miguel Barth",cidade:"Castro",uf:"PR",sit:"SEGUNDO FOTOS INSERIDAS EM RELATORIO DE OBRAS - FOI COBERTO NA DATA DE 18/05",est:"est. 6+12,40x12x6,30",pprod:"2025-10-01",pmont:"2025-11-10",pconcl:"2025-12-10",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002307",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"falta entrega tecnica",est:"amp. 24,40+6,00 x 36 x 5 lanternim 24m",pprod:"2025-10-10",pmont:"2025-11-17",pconcl:"2025-12-17",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002294",c:"Gerson Luis Zych",cidade:"Arapoti",uf:"PR",sit:"foi levantado as pl fossa , vai ir amanha 12/05 fazer cotenção+piso fazendo piso e fabricando portao",est:"est. 13+12,70+13 x 48 x 5,30; lanternim; 227 m² muretas; 22 pilares extras; canaleta 52 x 60 x0,60; 29 m² placas pista de transição lateral",pprod:"2025-10-03",pmont:"2025-11-24",pconcl:"2025-12-24",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002291",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP",sit:"falta piso, cliente está fazendo hidraulica Marildo falou que é para ter alguma alteração de aberturas",est:"3 est. Geminada de 10,50 x 37,50 x 6; 3 escadas; 1334 m² placa parede 8 cm; 135 m² placa muro 8 cm; 108 m² placa muro 10 cm",pprod:"2025-11-30",pmont:"2026-01-31",pconcl:"2026-03-02",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002313",c:"Boranelli Administradora de Bens Ltda",cidade:"Itapeva",uf:"SP",end:"Avenida Dona Paulina de Morais, 396, Jardim Maringá, Itapeva – SP",obra:true,sit:"fazendo acabamento; previsão de iniciar a montagem semana que vem; cliente precisa limpar o terreno para dar condição de trabalho, programar montagem cliente já limpou terreno 23/02 data prevista, em andamento a hélice contínua, montagem em andamento incio fund previsao de retorno na obra 15/03 em andamento montagem das tesouras metálicas vai ir na obra dia 13/05 revisao parte metalica, revisao da solda",est:"20 pilares , 700m de placa",pprod:"2025-12-17",pmont:"2026-02-02",pconcl:"2026-03-04",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002295",c:"Tuvivas Participações Ltda (Marjan)",cidade:"São Paulo",uf:"SP",end:"Rua Vigário Taques Bitencourt, 242, Santo Amaro, São Paulo – SP",sit:"fundação ok, esta instalando  placas e vigas dia 13/04 parte metálica instalada e soldada, falta  calhas inicio 27/04 a 29/04 , cobertura 27/04 a 29/04, piso, varanda falta telhas , escada ver como será resolvido sera escada metalica cliente ficou de definir e escada sera faturado direto para cliente homero passou orçamento escada assinado aditivo escada",est:"est. 14,80 x 42,45 x 11,90; vigas travamento; 1126 m² placas; 1 lance escada",pprod:"2025-11-28",pmont:"2026-02-13",pconcl:"2026-03-15",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002331",c:"Eltje Jan Rabbers",cidade:"Piraí do Sul",uf:"PR",sit:"montagem em andamento",est:"estrutura para suinos terminação",pprod:"",pmont:"2026-04-08",pconcl:"2026-05-08",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002336",c:"Jennifer Camily da Silva Moreira",cidade:"Guaiçara",uf:"SP",sit:"fabrica",est:"01 ampliação de estrutura pré-fabricada de concreto armada de 12,00 x 12,00 m",pprod:"2026-04-30",pmont:"2026-05-30",pconcl:"2026-06-29",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
   {p:"P002314",c:"Luiz Fernando Rodrigues da Silva",cidade:"Ponta Grossa",uf:"PR",sit:"cobertura OK, piso ok entrega tecnica falta",est:"est.5x30x5 , + placa"},
-  {p:"P002346",c:"Marinus Hajen",cidade:"Arapoti",uf:"PR",end:"Chácara Linquinda, s/n, 2ª Lomba, Colônia Holandesa, Arapoti – PR",obra:true,sit:"20 placas,   já com a alteração de projeto fazendo fundação montagem em andamento",est:"2 EST. 30 m com placas"},
-  {p:"P002378",c:"Marinus Hagen Filho",cidade:"Arapoti",uf:"PR",sit:"falta terças pevisao essa semana",est:"est 5,00 x 15,00 m,"},
-  {p:"P002343",c:"Jose Carlos Oppis",cidade:"Araucária",uf:"PR",sit:"paralisado não esta liberado o terreno para montagem",est:"est. 11x19x4"},
-  {p:"P000619",c:"Marcos Krubnik",cidade:"Piraí do Sul",uf:"PR",end:"Rodovia PR 090, km 155, s/n, Campina do Butiá, Piraí do Sul – PR",obra:true,sit:"em montagem falta cobrir",est:"est.20x24x5"},
-  {p:"P002393",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"esta ok falta entrega tecnica",est:"Reforma cobertura para estrutura existente de 18,39 m por fora x 44,00 m"},
-  {p:"P002173",c:"Diego Felippe Geremias de Souza",cidade:"Promissão",uf:"SP",sit:"falta piso",est:"partes adicionais internos para compost"},
-  {p:"P002341",c:"Mario Gabriel Filho",cidade:"Taquarituba",uf:"SP",sit:"projeto esta ok tirar esquadro da obra vai amanha ou quarta feira tirar esquadro da obra",est:"EST. 24X24X8,5 +1390 m² de placas"},
-  {p:"P002347",c:"Sigmund Schartner",cidade:"Palmeira",uf:"PR",end:"Chácara Úrsula, s/n, Colônia Witmarsum, Palmeira – PR",obra:true,sit:"em montagem esta abrindo estrada para melhor acesso cliente pediu adicional da placa",est:"est. 23x30x6"},
-  {p:"P002356",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"Cobertura ok falta entrega tecnica",est:"est.8,5x 1,30x3,98"},
-  {p:"P002352",c:"Academia Fitshape Ltda",cidade:"Castro",uf:"PR",end:"Rua Coronel Vidal Martins de Oliveira, 677, Vila Rio Branco, Castro – PR",sit:"esta ok falta somente 2 rufos + piso ir na unibox para ver o laminado onde molhou e estufou falta piso adicional",est:"est. 4x21x3,20"},
+  {p:"P002346",c:"Marinus Hajen",cidade:"Arapoti",uf:"PR",end:"Chácara Linquinda, s/n, 2ª Lomba, Colônia Holandesa, Arapoti – PR",obra:true,sit:"20 placas,   já com a alteração de projeto fazendo fundação montagem em andamento",est:"2 EST. 30 m com placas",pprod:"2026-02-10",pmont:"",pconcl:"",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002378",c:"Marinus Hagen Filho",cidade:"Arapoti",uf:"PR",sit:"falta terças pevisao essa semana",est:"est 5,00 x 15,00 m,",pprod:"",pmont:"",pconcl:"",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002343",c:"Jose Carlos Oppis",cidade:"Araucária",uf:"PR",sit:"paralisado não esta liberado o terreno para montagem",est:"est. 11x19x4",pprod:"2026-02-10",pmont:"2026-03-20",pconcl:"2026-04-19",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P000619",c:"Marcos Krubnik",cidade:"Piraí do Sul",uf:"PR",end:"Rodovia PR 090, km 155, s/n, Campina do Butiá, Piraí do Sul – PR",obra:true,sit:"em montagem falta cobrir",est:"est.20x24x5",pprod:"2026-02-19",pmont:"2026-03-29",pconcl:"2026-04-28",montsrc:"prazo",aprov:"Aguardando cliente",prod:"Em andamento"},
+  {p:"P002393",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"esta ok falta entrega tecnica",est:"Reforma cobertura para estrutura existente de 18,39 m por fora x 44,00 m",pprod:"",pmont:"2026-04-08",pconcl:"2026-05-08",montsrc:"prazo",aprov:"",prod:""},
+  {p:"P002173",c:"Diego Felippe Geremias de Souza",cidade:"Promissão",uf:"SP",sit:"falta piso",est:"partes adicionais internos para compost",pprod:"2026-02-28",pmont:"2026-04-10",pconcl:"2026-05-10",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002341",c:"Mario Gabriel Filho",cidade:"Taquarituba",uf:"SP",sit:"projeto esta ok tirar esquadro da obra vai amanha ou quarta feira tirar esquadro da obra",est:"EST. 24X24X8,5 +1390 m² de placas",pprod:"2026-02-01",pmont:"2026-04-10",pconcl:"2026-05-10",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002347",c:"Sigmund Schartner",cidade:"Palmeira",uf:"PR",end:"Chácara Úrsula, s/n, Colônia Witmarsum, Palmeira – PR",obra:true,sit:"em montagem esta abrindo estrada para melhor acesso cliente pediu adicional da placa",est:"est. 23x30x6",pprod:"2026-02-01",pmont:"2026-04-10",pconcl:"2026-05-10",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002356",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"Cobertura ok falta entrega tecnica",est:"est.8,5x 1,30x3,98",pprod:"2026-02-13",pmont:"2026-04-23",pconcl:"2026-05-23",montsrc:"prazo",aprov:"Aprovado",prod:""},
+  {p:"P002352",c:"Academia Fitshape Ltda",cidade:"Castro",uf:"PR",end:"Rua Coronel Vidal Martins de Oliveira, 677, Vila Rio Branco, Castro – PR",sit:"esta ok falta somente 2 rufos + piso ir na unibox para ver o laminado onde molhou e estufou falta piso adicional",est:"est. 4x21x3,20",pprod:"2026-03-14",pmont:"2026-04-24",pconcl:"2026-05-24",montsrc:"prazo",aprov:"Aprovado",prod:""},
   {p:"P002345",c:"Luiz Fernando Rodrigues",cidade:"Ponta Grossa",uf:"PR",sit:"falta entrega tecnica",est:"est. 16,5x15x5 , + placas"},
-  {p:"P001682",c:"JFR Empreendimentos Imobiliarios Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Avenida Visconde de Taunay, 1417, Ronda, Ponta Grossa – PR",sit:"4 escada, 6 pilar , 40 placas cliente vai executar fundação precisa de conferencia",est:"est 10x26,50x9,81+90 m² de placas"},
-  {p:"P002367",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",sit:"Falta 3 pilar pequeno,  11 mureta  inicio montagem 13/04, montagem em andamento vai ter ajuste projeto vai ter alteração em 2 pilar, ver se  vai ter fixadores para placa",est:"est. 2,5+12,40+12,7+12,40+2,5x84x4,5"},
-  {p:"P002373",c:"SRB Consultoria e Assessoria Empresarial Ltda",cidade:"Curitiba",uf:"PR",end:"Rua Chile, 1791, Rebouças, Curitiba – PR",sit:"produção OK, acabamento ok, cliente vai montar sem alvará previsao dia 06/06 montagem",est:"(est 3,79x11,10x3,55) (10x11,50x5,10)"},
-  {p:"P002364",c:"Lilian da Rosa Weigert Benazzi Ltda",cidade:"Jaguariaíva",uf:"PR",end:"Rua Rovilio Christianetti, 475, Distrito Industrial Ari Fanchin, Jaguariaíva – PR",obra:true,sit:"acabamento ok e produção ok programar montagem",est:"est. 8x10x3+2,5"},
-  {p:"P002358",c:"Anderson Santos",cidade:"Castro",uf:"PR",end:"Avenida das Flores, S/N, Jardim Termas Riviera, Castro – PR",sit:"falta cobrir",est:"est. 21x25 36,90 x7,5"},
-  {p:"P002368",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"falta cobrir",est:"est. 11x60x3,75 e 3,50"},
+  {p:"P001682",c:"JFR Empreendimentos Imobiliarios Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Avenida Visconde de Taunay, 1417, Ronda, Ponta Grossa – PR",sit:"4 escada, 6 pilar , 40 placas cliente vai executar fundação precisa de conferencia",est:"est 10x26,50x9,81+90 m² de placas",pprod:"2026-03-16",pmont:"2026-04-26",pconcl:"2026-05-26",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002367",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",sit:"Falta 3 pilar pequeno,  11 mureta  inicio montagem 13/04, montagem em andamento vai ter ajuste projeto vai ter alteração em 2 pilar, ver se  vai ter fixadores para placa",est:"est. 2,5+12,40+12,7+12,40+2,5x84x4,5",pprod:"2026-03-17",pmont:"2026-04-27",pconcl:"2026-05-27",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002373",c:"SRB Consultoria e Assessoria Empresarial Ltda",cidade:"Curitiba",uf:"PR",end:"Rua Chile, 1791, Rebouças, Curitiba – PR",sit:"produção OK, acabamento ok, cliente vai montar sem alvará previsao dia 06/06 montagem",est:"(est 3,79x11,10x3,55) (10x11,50x5,10)",pprod:"2026-03-18",pmont:"2026-04-28",pconcl:"2026-05-28",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002364",c:"Lilian da Rosa Weigert Benazzi Ltda",cidade:"Jaguariaíva",uf:"PR",end:"Rua Rovilio Christianetti, 475, Distrito Industrial Ari Fanchin, Jaguariaíva – PR",obra:true,sit:"acabamento ok e produção ok programar montagem",est:"est. 8x10x3+2,5",pprod:"2026-03-19",pmont:"2026-04-29",pconcl:"2026-05-29",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002358",c:"Anderson Santos",cidade:"Castro",uf:"PR",end:"Avenida das Flores, S/N, Jardim Termas Riviera, Castro – PR",sit:"falta cobrir",est:"est. 21x25 36,90 x7,5",pprod:"2026-03-19",pmont:"2026-04-29",pconcl:"2026-05-29",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002368",c:"Douwe Jantinus Groenwold",cidade:"Castro",uf:"PR",sit:"falta cobrir",est:"est. 11x60x3,75 e 3,50",pprod:"2026-03-25",pmont:"2026-05-04",pconcl:"2026-06-03",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
   {p:"P002360",c:"Daniel Leonardo Los",cidade:"Carambeí",uf:"PR",end:"Chácara Talismã, s/n, Bairro Catanduva, Carambeí – PR",obra:true,sit:"em montagem, falta cobrir",est:"est. 18x30x6"},
-  {p:"P002354",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"falta entrega tecnica",est:"est 24,35x24+ um est 14,7x36"},
-  {p:"P002416",c:"Adriaan Frederik Kok",cidade:"Arapoti",uf:"PR",sit:"fora 18/05 montar",est:"01 alpendre metálico de 3,00 x 6,00 m, com tesouras metálicas,"},
-  {p:"P001686",c:"Paroquia Senhor Menino Deus",cidade:"Piraí do Sul",uf:"PR",end:"Capela São Pedro, S/N, Tijuco Preto, Castro – PR",sit:"entrega tecnica",est:"est.12x10x4"},
-  {p:"P002357",c:"Fabiano Pauls",cidade:"Palmeira",uf:"PR",end:"Chácara Granja CP Rocky, s/n, Colônia Witmarsum, Palmeira – PR",obra:true,sit:"em montagem",est:"est.32x48x4"},
-  {p:"P002350",c:"Paulo Sergio Assunção",cidade:"Tibagi",uf:"PR",end:"Fazenda Santa Branca, s/n, Bairro Alto do Amparo, Tibagi – PR",obra:true,sit:"falta 70  pilar , 75 placas - SENDO REALIZADO REFORÇO METALICO - previsão 21/05",est:"466 m² placas +126 pilares para fixação de placas"},
-  {p:"P001685",c:"Viverti Apucarana 03 Incorporação Imobiliaria SPE Ltda",cidade:"Apucarana",uf:"PR",end:"Rua José Ferragine, S/N, Conj. Habitacional Solo Sagrado, Apucarana – PR",obra:true,sit:"quadra 05 cliente atrasou a fundação; quadra 44 falta ok; quadra 10 esta na fabrica; guile vai montar essa semana em  montagem quadra 05",est:"muros pré fabricados"},
-  {p:"P002395",c:"Zero Residuos Ltda",cidade:"Ponta Grossa",uf:"PR",sit:"vai ter ajuste pilar metalico para fechamento",est:"01 alpendre de 10,40 x 1,60 m"},
-  {p:"P002361",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"ok produção e acab ok, vai mexer na terraplanagem",est:"01 base de caixa d’água de 5,00 largura x 10,00 m comprimento x 5,30 m altura até a laje"},
-  {p:"P002380",c:"Luiz Jose Sguario Neto / Veneto Participações",cidade:"Itapeva",uf:"SP",end:"Rodovia Governador Mário Covas, S/N, Ribeirão Fundo, Itapeva – SP",sit:"acabamentos ok previsao montagem final do mês 05",est:"est. 10x40x6"},
-  {p:"P001687",c:"Otoniel de Jesus",cidade:"Ponta Grossa",uf:"PR",sit:"falta 1 pl",est:"EST 12X17X6 , 370m2 de placa para fechamentos de paredee platibanda espessura 8cm."},
-  {p:"P001684",c:"William Benke",cidade:"Castro",uf:"PR",sit:"fabrica",est:"5 placas em concreto armado de 6,00 x 1,50 x 0,12 m frete para entrega"},
-  {p:"P002117",c:"Unicesumar",cidade:"Ponta Grossa",uf:"PR",end:"Rua Desembargador Westphalen, 60, Oficinas, Ponta Grossa – PR",sit:"em andamento produção; ; pilar em pe instalando vigas e lajes e placas  ajuste projeto ok e produzidos",est:"4 Pavimentos 26,30x24,70"},
-  {p:"P002321",c:"Mateus de Oliveira Silvestre de Moraes",cidade:"Palmital",uf:"SP",end:"Rua Jesus Ortis Toral, 227/239, Distrito Industrial Basílio, Palmital – SP",sit:"concreto e trator por conta do cliente para fundação previsao montagem 19/05 gemes irem na obra amanha 12/05 bater esquadro",est:"est. 20x48x6,9"},
-  {p:"P002391",c:"JRW Veiculos Ltda",cidade:"Telêmaco Borba",uf:"PR",sit:"Falta  1 escadas,44pl",est:"est 9,90 x 24,00 m + 387 m² placas"},
-  {p:"P002254",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP",sit:"ATENÇÃO AOS PRAZOS esta verificando sobre a obra foi passado alteraçãoes para ver se vão aprovar, marcado reunião na terça dia 28/04 para definir",est:"est estacionamento 3 andares 22,30 x 23,95 x 2,85+2,85+2,85; vigas"},
-  {p:"P002417",c:"Centro de Treinamento para Pecuaristas",cidade:"Castro",uf:"PR",end:"Fazenda Capão do Cipó, S/N, Maracanã, Castro – PR",sit:"fabrica",est:"est de 9,00 x 24,00 m"},
-  {p:"P002410",c:"Tiago Dias de Oliveira",cidade:"Itapeva",uf:"SP",sit:"engenharia",est:"9 pilar , 62m² de placa"},
-  {p:"P002396",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP",sit:"fabrica",est:"est 25,00 x 12,00 m + 243 m²  placas"},
-  {p:"P002392",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",end:"Fazenda Alvorada, s/n, 3ª Lomba, Arapoti – PR",obra:true,sit:"fabricar placas proxima semana",est:"est 25,00 x 64,25 m+ 597 m² placas"},
-  {p:"P002419",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP",sit:"engenharia",est:"EST de 10,00 x 42,00 m x 5 altura com placas + 01 estrutura  fossa dejetos circular de 13 de diâmetro x 3 altura COM PLACAS"},
-  {p:"P002420",c:"Judy Mary Fonseca Grando",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 09, Jardim Colonial, Castro – PR",sit:"engenharia",est:"est 10,00 x 20,00 m com placas"},
-  {p:"P002401",c:"Clemente Lourenco Gerhards",cidade:"Castro",uf:"PR",sit:"engenharia",est:"est 17,00 x 42,00 m"},
-  {p:"P002113",c:"Wagner Muller Ribeiro",cidade:"Arapoti",uf:"PR",sit:"cliente vai aguardar liberação do alvará",est:"est. 3 andares 24,25 x 18,90 x 4,23+6,55+4,38; 3 escadas pré-fabricadas; 931 m² placas;"},
-  {p:"P002379",c:"Andrade Comercio de Cereais Ltda",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 300, Jardim Colonial, Castro – PR",sit:"falta 5 pilar e 38 pl",est:"est 17,50 x 30,00 m, + 258 m²  placas +•01 alpendre metálico de 18,80 m x 4,00 m"},
-  {p:"P002306",c:"Pedreira Genaro Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Estrada Antiga Francisco Herculano de Lara, S/N, Jardim Carvalho, Ponta Grossa – PR",sit:"na engenharia",est:"est 11,20 x 28,00 m + 395,06 m²  placas"},
-  {p:"P001689",c:"Jan Ate de Jager",cidade:"Piraí do Sul",uf:"PR",sit:"fabrica",est:"est 25,00 x 48,00 m + 516,28 m² placas"},
-  {p:"P002404",c:"VPJ Comercio de Produtos Alimenticios Ltda",cidade:"Pirassununga",uf:"SP",sit:"engenharia",est:"EST 14,00 x 62,00 m+466 m²  PLACAS"},
-  {p:"P002412",c:"Carlos Alberto Mendes Mancilha",cidade:"Pouso Alto",uf:"MG",sit:"engenharia",est:"EST 17,30 x 54,00 m + PLACAS"},
-  {p:"P001681",c:"Janio Luiz Pereira",cidade:"Ponta Grossa",uf:"PR",sit:"fabrica",est:"EST 2 ANDARES , AREAR UTEL 218 + EST VAO LIVRE 67+ 01 estrutura para base de caixa d agua com fechamento de paredes+placas"},
-  {p:"P001691",c:"Transportadora Begnini Ltda",cidade:"Carambeí",uf:"PR",sit:"engenharia",est:"est 13,9 x 24 x 7m totalizando 326m²"},
-  {p:"P001692",c:"Jose Carlos Regatiere",cidade:"Castro",uf:"PR"}
+  {p:"P002354",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"falta entrega tecnica",est:"est 24,35x24+ um est 14,7x36",pprod:"2026-03-29",pmont:"2026-05-08",pconcl:"2026-06-07",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002416",c:"Adriaan Frederik Kok",cidade:"Arapoti",uf:"PR",sit:"fora 18/05 montar",est:"01 alpendre metálico de 3,00 x 6,00 m, com tesouras metálicas,",pprod:"",pmont:"2026-05-08",pconcl:"2026-06-07",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P001686",c:"Paroquia Senhor Menino Deus",cidade:"Piraí do Sul",uf:"PR",end:"Capela São Pedro, S/N, Tijuco Preto, Castro – PR",sit:"entrega tecnica",est:"est.12x10x4",pprod:"2026-04-03",pmont:"2026-05-13",pconcl:"2026-06-12",montsrc:"prazo",aprov:"Aprovado",prod:"Concluída"},
+  {p:"P002357",c:"Fabiano Pauls",cidade:"Palmeira",uf:"PR",end:"Chácara Granja CP Rocky, s/n, Colônia Witmarsum, Palmeira – PR",obra:true,sit:"em montagem",est:"est.32x48x4",pprod:"2026-04-08",pmont:"2026-05-18",pconcl:"2026-06-17",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002350",c:"Paulo Sergio Assunção",cidade:"Tibagi",uf:"PR",end:"Fazenda Santa Branca, s/n, Bairro Alto do Amparo, Tibagi – PR",obra:true,sit:"falta 70  pilar , 75 placas - SENDO REALIZADO REFORÇO METALICO - previsão 21/05",est:"466 m² placas +126 pilares para fixação de placas",pprod:"2026-05-10",pmont:"2026-07-10",pconcl:"2026-08-09",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P001685",c:"Viverti Apucarana 03 Incorporação Imobiliaria SPE Ltda",cidade:"Apucarana",uf:"PR",end:"Rua José Ferragine, S/N, Conj. Habitacional Solo Sagrado, Apucarana – PR",obra:true,sit:"quadra 05 cliente atrasou a fundação; quadra 44 falta ok; quadra 10 esta na fabrica; guile vai montar essa semana em  montagem quadra 05",est:"muros pré fabricados",pprod:"2026-04-19",pmont:"2026-05-29",pconcl:"2026-06-28",montsrc:"prazo",aprov:"",prod:"Em andamento"},
+  {p:"P002395",c:"Zero Residuos Ltda",cidade:"Ponta Grossa",uf:"PR",sit:"vai ter ajuste pilar metalico para fechamento",est:"01 alpendre de 10,40 x 1,60 m",pprod:"2026-04-20",pmont:"2026-05-29",pconcl:"2026-06-28",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002361",c:"Marco Antonio Gomes Basso",cidade:"Castro",uf:"PR",sit:"ok produção e acab ok, vai mexer na terraplanagem",est:"01 base de caixa d’água de 5,00 largura x 10,00 m comprimento x 5,30 m altura até a laje",pprod:"2026-04-02",pmont:"2026-06-02",pconcl:"2026-07-02",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002380",c:"Luiz Jose Sguario Neto / Veneto Participações",cidade:"Itapeva",uf:"SP",end:"Rodovia Governador Mário Covas, S/N, Ribeirão Fundo, Itapeva – SP",sit:"acabamentos ok previsao montagem final do mês 05",est:"est. 10x40x6",pprod:"2026-04-23",pmont:"2026-06-03",pconcl:"2026-07-03",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P001687",c:"Otoniel de Jesus",cidade:"Ponta Grossa",uf:"PR",sit:"falta 1 pl",est:"EST 12X17X6 , 370m2 de placa para fechamentos de paredee platibanda espessura 8cm.",pprod:"2026-04-27",pmont:"2026-06-06",pconcl:"2026-07-06",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P001684",c:"William Benke",cidade:"Castro",uf:"PR",sit:"fabrica",est:"5 placas em concreto armado de 6,00 x 1,50 x 0,12 m frete para entrega",pprod:"",pmont:"2026-06-07",pconcl:"2026-07-07",montsrc:"prazo",aprov:"",prod:""},
+  {p:"P002117",c:"Unicesumar",cidade:"Ponta Grossa",uf:"PR",end:"Rua Desembargador Westphalen, 60, Oficinas, Ponta Grossa – PR",sit:"em andamento produção; ; pilar em pe instalando vigas e lajes e placas  ajuste projeto ok e produzidos",est:"4 Pavimentos 26,30x24,70",pprod:"2026-05-05",pmont:"2026-06-15",pconcl:"2026-07-15",montsrc:"prazo",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002321",c:"Mateus de Oliveira Silvestre de Moraes",cidade:"Palmital",uf:"SP",end:"Rua Jesus Ortis Toral, 227/239, Distrito Industrial Basílio, Palmital – SP",sit:"concreto e trator por conta do cliente para fundação previsao montagem 19/05 gemes irem na obra amanha 12/05 bater esquadro",est:"est. 20x48x6,9",pprod:"2026-05-20",pmont:"2026-05-19",pconcl:"2026-06-18",montsrc:"texto",aprov:"Aprovado",prod:"Em andamento"},
+  {p:"P002391",c:"JRW Veiculos Ltda",cidade:"Telêmaco Borba",uf:"PR",sit:"Falta  1 escadas,44pl",est:"est 9,90 x 24,00 m + 387 m² placas",pprod:"2026-05-01",pmont:"2026-07-01",pconcl:"2026-07-31",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002254",c:"Batista Administradora de Bens Ltda - Central Park",cidade:"Itapeva",uf:"SP",sit:"ATENÇÃO AOS PRAZOS esta verificando sobre a obra foi passado alteraçãoes para ver se vão aprovar, marcado reunião na terça dia 28/04 para definir",est:"est estacionamento 3 andares 22,30 x 23,95 x 2,85+2,85+2,85; vigas",pprod:"2026-05-22",pmont:"2026-07-03",pconcl:"2026-08-02",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002417",c:"Centro de Treinamento para Pecuaristas",cidade:"Castro",uf:"PR",end:"Fazenda Capão do Cipó, S/N, Maracanã, Castro – PR",sit:"fabrica",est:"est de 9,00 x 24,00 m",pprod:"2026-05-08",pmont:"2026-07-08",pconcl:"2026-08-07",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002410",c:"Tiago Dias de Oliveira",cidade:"Itapeva",uf:"SP",sit:"engenharia",est:"9 pilar , 62m² de placa",pprod:"2026-05-13",pmont:"2026-07-13",pconcl:"2026-08-12",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002396",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP",sit:"fabrica",est:"est 25,00 x 12,00 m + 243 m²  placas",pprod:"2026-05-21",pmont:"2026-07-21",pconcl:"2026-08-20",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002392",c:"Willian Ferdinand Van Der Goot",cidade:"Arapoti",uf:"PR",end:"Fazenda Alvorada, s/n, 3ª Lomba, Arapoti – PR",obra:true,sit:"fabricar placas proxima semana",est:"est 25,00 x 64,25 m+ 597 m² placas",pprod:"2026-05-30",pmont:"2026-07-31",pconcl:"2026-08-30",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002419",c:"Jennifer Camily da Silva",cidade:"Guaiçara",uf:"SP",sit:"engenharia",est:"EST de 10,00 x 42,00 m x 5 altura com placas + 01 estrutura  fossa dejetos circular de 13 de diâmetro x 3 altura COM PLACAS",pprod:"2026-06-01",pmont:"2026-08-01",pconcl:"2026-08-31",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002420",c:"Judy Mary Fonseca Grando",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 09, Jardim Colonial, Castro – PR",sit:"engenharia",est:"est 10,00 x 20,00 m com placas",pprod:"2026-06-01",pmont:"2026-08-01",pconcl:"2026-08-31",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002401",c:"Clemente Lourenco Gerhards",cidade:"Castro",uf:"PR",sit:"engenharia",est:"est 17,00 x 42,00 m",pprod:"2026-06-04",pmont:"2026-08-04",pconcl:"2026-09-03",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002113",c:"Wagner Muller Ribeiro",cidade:"Arapoti",uf:"PR",sit:"cliente vai aguardar liberação do alvará",est:"est. 3 andares 24,25 x 18,90 x 4,23+6,55+4,38; 3 escadas pré-fabricadas; 931 m² placas;",pprod:"2026-05-22",pmont:"2026-08-07",pconcl:"2026-09-06",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002379",c:"Andrade Comercio de Cereais Ltda",cidade:"Castro",uf:"PR",end:"Avenida Prefeito Ronie Cardoso, 300, Jardim Colonial, Castro – PR",sit:"falta 5 pilar e 38 pl",est:"est 17,50 x 30,00 m, + 258 m²  placas +•01 alpendre metálico de 18,80 m x 4,00 m",pprod:"2026-06-12",pmont:"2026-08-12",pconcl:"2026-09-11",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002306",c:"Pedreira Genaro Ltda",cidade:"Ponta Grossa",uf:"PR",end:"Estrada Antiga Francisco Herculano de Lara, S/N, Jardim Carvalho, Ponta Grossa – PR",sit:"na engenharia",est:"est 11,20 x 28,00 m + 395,06 m²  placas",pprod:"2026-06-17",pmont:"2026-08-17",pconcl:"2026-09-16",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P001689",c:"Jan Ate de Jager",cidade:"Piraí do Sul",uf:"PR",sit:"fabrica",est:"est 25,00 x 48,00 m + 516,28 m² placas",pprod:"2026-06-19",pmont:"2026-08-19",pconcl:"2026-09-18",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P002404",c:"VPJ Comercio de Produtos Alimenticios Ltda",cidade:"Pirassununga",uf:"SP",sit:"engenharia",est:"EST 14,00 x 62,00 m+466 m²  PLACAS",pprod:"2026-05-21",pmont:"2026-08-21",pconcl:"2026-09-20",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P002412",c:"Carlos Alberto Mendes Mancilha",cidade:"Pouso Alto",uf:"MG",sit:"engenharia",est:"EST 17,30 x 54,00 m + PLACAS",pprod:"2026-06-25",pmont:"2026-08-25",pconcl:"2026-09-24",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P001681",c:"Janio Luiz Pereira",cidade:"Ponta Grossa",uf:"PR",sit:"fabrica",est:"EST 2 ANDARES , AREAR UTEL 218 + EST VAO LIVRE 67+ 01 estrutura para base de caixa d agua com fechamento de paredes+placas",pprod:"2026-06-17",pmont:"2026-09-17",pconcl:"2026-10-17",montsrc:"prazo",aprov:"Aprovado",prod:"Não iniciou"},
+  {p:"P001691",c:"Transportadora Begnini Ltda",cidade:"Carambeí",uf:"PR",sit:"engenharia",est:"est 13,9 x 24 x 7m totalizando 326m²",pprod:"2026-08-14",pmont:"2026-10-14",pconcl:"2026-11-13",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
+  {p:"P001692",c:"Jose Carlos Regatiere",cidade:"Castro",uf:"PR",pprod:"2026-08-11",pmont:"2026-09-11",pconcl:"2026-10-11",montsrc:"prazo",aprov:"",prod:"Não iniciou"},
 ];
 
 // Build index: key = integer value of pedido number (no leading zeros)
@@ -656,6 +678,73 @@ function aplicar(r) {
   } else {
     tipoWrap.classList.remove('show');
   }
+
+  renderTimeline(r);
+}
+
+function fmtData(iso){
+  if (!iso) return '';
+  var p = iso.split('-');
+  return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+// Monta as fases da obra a partir dos dados disponíveis
+function fasesObra(r){
+  var hoje = new Date();
+  var fases = [];
+  // 1. Projeto / Aprovação
+  var aprovOk = r.aprov && /aprovad/i.test(r.aprov);
+  fases.push({
+    nome:'Projeto / Aprovação',
+    estado: aprovOk ? 'done' : (r.aprov ? 'active' : 'pending'),
+    status: r.aprov ? r.aprov : 'Sem informação'
+  });
+  // 2. Prazo Final de Produção
+  var prodTxt = r.prod || '';
+  var prodDone = /conclu|ok|finaliz|pronto|produzid/i.test(prodTxt);
+  var prodAndamento = /andamento|em prod/i.test(prodTxt);
+  fases.push({
+    nome:'Prazo Final de Produção',
+    estado: prodDone ? 'done' : (prodTxt ? 'active' : 'pending'),
+    status: r.pprod ? fmtData(r.pprod) + (prodTxt ? ' · '+prodTxt : '') : (prodTxt || 'Sem informação')
+  });
+  // 3. Montagem (data já vem tratada: texto perto de 'montagem' senão prazo final)
+  var montEstado = 'pending';
+  var montStatus = 'Aguardando';
+  if (r.pmont){
+    var dM = new Date(r.pmont+'T00:00:00');
+    if (dM < hoje && !prodDone) { montEstado = 'late'; montStatus = fmtData(r.pmont) + ' (vencido)'; }
+    else if (prodDone || prodAndamento) { montEstado = 'active'; montStatus = fmtData(r.pmont); }
+    else { montStatus = fmtData(r.pmont); }
+  }
+  fases.push({nome:'Montagem', estado:montEstado, status:montStatus});
+  // 4. Entrega Técnica (30 dias após a montagem)
+  var concluida = r.sit && /entregue|conclu|finaliz/i.test(r.sit) && !/falta|aguard|pendente/i.test(r.sit);
+  fases.push({
+    nome:'Entrega Técnica',
+    estado: concluida ? 'done' : 'pending',
+    status: concluida ? 'Obra concluída' : (r.pconcl ? fmtData(r.pconcl) + ' (30 dias após montagem)' : 'A definir')
+  });
+  return fases;
+}
+
+function renderTimeline(r){
+  var wrap = document.getElementById('tl-wrap');
+  // Só mostra se houver ao menos um dado de fase
+  if (!r || (!r.aprov && !r.prod && !r.pprod && !r.pmont)){
+    wrap.style.display = 'none';
+    return;
+  }
+  var fases = fasesObra(r);
+  var icones = {done:'✓', active:'●', pending:'', late:'!'};
+  var html = '<div class="tl-track">';
+  fases.forEach(function(f){
+    html += '<div class="tl-step"><div class="tl-dot '+f.estado+'">'+icones[f.estado]+'</div>'
+         +  '<div class="tl-info"><div class="tl-fase">'+f.nome+'</div><div class="tl-status">'+f.status+'</div></div></div>';
+  });
+  html += '</div>';
+  document.getElementById('tl-track').innerHTML = html;
+  wrap.style.display = 'block';
 }
 
 function toggleSit() {
@@ -690,6 +779,7 @@ function limparCampos() {
   var lb = document.getElementById('loc-box'); if (lb) { lb.className = 'loc-box'; }
   var sb = document.getElementById('sit-wrap'); if (sb) sb.classList.remove('show');
   var tw = document.getElementById('tipo-wrap'); if (tw) tw.classList.remove('show');
+  var tl = document.getElementById('tl-wrap'); if (tl) tl.style.display = 'none';
   document.getElementById('badge-obra').style.display = 'none';
 }
 
@@ -964,6 +1054,25 @@ function gerarPDF() {
   var assNome = document.getElementById('assin-nome').value.trim();
   var assImg = sigHasInk ? sigCanvas.toDataURL('image/png') : '';
 
+  // Linha do tempo da obra (só entra no PDF se o checkbox estiver marcado)
+  var tlHtml = '';
+  var incluirTL = document.getElementById('tl-no-pdf') && document.getElementById('tl-no-pdf').checked;
+  if (incluirTL && atual && (atual.aprov || atual.prod || atual.pprod || atual.pmont)){
+    var fs = fasesObra(atual);
+    var cores = {done:'#16a34a',active:'#185FA5',pending:'#cbd5e1',late:'#dc2626'};
+    var ic = {done:'✓',active:'●',pending:'',late:'!'};
+    tlHtml = '<div class="sec"><div class="st">Linha do tempo da obra</div><div class="pdf-tl">';
+    fs.forEach(function(f,i){
+      var last = (i === fs.length-1);
+      tlHtml += '<div class="pdf-tl-step">'
+        + '<div class="pdf-tl-dot" style="background:'+cores[f.estado]+'">'+ic[f.estado]+'</div>'
+        + (last?'':'<div class="pdf-tl-line"></div>')
+        + '<div class="pdf-tl-info"><span class="pdf-tl-fase">'+f.nome+'</span> <span class="pdf-tl-st">'+f.status+'</span></div>'
+        + '</div>';
+    });
+    tlHtml += '</div></div>';
+  }
+
   var html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"/><title>Relatório Técnico — '+pedido+'</title>'
   +'<style>'
   +'*{box-sizing:border-box;margin:0;padding:0}'
@@ -990,6 +1099,12 @@ function gerarPDF() {
   +'.efase-ativ{font-size:9.5pt;color:#333;padding:2px 2px 2px 8px;line-height:1.4}'
   +'.efase-eq{font-size:9.5pt;color:#111;padding:2px 2px 4px 8px;line-height:1.4}'
   +'.efase-obj strong,.efase-ativ strong,.efase-eq strong{color:#1a3d6b;font-weight:700}'
+  +'.pdf-tl{padding:2px 0}'
+  +'.pdf-tl-step{position:relative;padding:0 0 9px 26px;min-height:20px}'
+  +'.pdf-tl-dot{position:absolute;left:0;top:0;width:17px;height:17px;border-radius:50%;color:#fff;font-size:9pt;font-weight:700;text-align:center;line-height:17px}'
+  +'.pdf-tl-line{position:absolute;left:8px;top:17px;bottom:0;width:1.5pt;background:#dde5f0}'
+  +'.pdf-tl-fase{font-size:9.5pt;font-weight:700;color:#1a3d6b}'
+  +'.pdf-tl-st{font-size:9pt;color:#555}'
   +'.chips{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}'
   +'.chip{font-size:8.5pt;padding:3px 11px;background:#e8eef7;color:#1a3d6b;font-weight:700;border-radius:3px}'
   +'.ta{font-size:10pt;line-height:1.7;color:#111;padding:5px 0;min-height:40px}'
@@ -1017,6 +1132,7 @@ function gerarPDF() {
   +'<div class="g3"><div class="f"><div class="fl">Data</div><div class="fv">'+dataFmt+'</div></div><div class="f"><div class="fl">Responsável técnico</div><div class="fv">Pablo Rodrigo Ribeiro</div></div><div class="f"><div class="fl">CREA</div><div class="fv">83.338/D-PR</div></div></div>'
   +'</div>'
   +(equipe.length?'<div class="sec"><div class="st">Equipe presente por fase</div>'+equipeHtml+'</div>':'')
+  +tlHtml
   +'<div class="sec"><div class="st">Objetivo da visita</div>'+(objs.length?'<div class="chips">'+objs.map(function(o){return'<span class="chip">'+o+'</span>';}).join('')+'</div>':'<span class="nd">Não informado</span>')+'</div>'
   +'<div class="sec"><div class="st">Considerações técnicas</div><div class="ta">'+cons.replace(/\n/g,'<br>')+'</div></div>'
   +'<div class="sec"><div class="st">Conclusão</div><div class="ta">'+conc.replace(/\n/g,'<br>')+'</div></div>'
